@@ -49,5 +49,17 @@ If you get something like this
 `[u'Midi Through Port-0', u'USB2.0-MIDI MIDI 1']`
 you're golden. The **USB2.0-MIDI MIDI 1** is what you want to see.
 
+#Installation
+
+TODO Add proper install instructions here.
+
+```
+git clone https://github.com/dodgyrabbit/midi-light-py
+git submodule init
+git submodule update
+```
+
+
+
 
 
