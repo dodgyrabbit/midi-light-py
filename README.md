@@ -1,12 +1,12 @@
 # midi-light-py
-An LED strip powered by a Raspberry PI and MIDI keyboard
+An LED strip controlled by a Raspberry PI and MIDI keyboard.
 
 # Overview
 Add some lighting effects to your music, by attaching an LED strip and Raspberry PI to your MIDI keyboard.
 The MIDI output is used as an input to the RPI and processed to create various effects. Place the
 LED strip behind your keyboard for a nice effect.
 
-The project was developed on Linux but pretty sure you can make it work on Windows or Mac.
+The project was developed on Linux using [Visual Studio Code](http://code.visualstudio.com/) but pretty sure you can make it work on Windows or Mac.
 
 ## Hardware
 * [Raspberry Pi 3](https://www.raspberrypi.org/) - Older Pi will also work. I got this one so I can add a [Perma Proto HAT] (https://www.adafruit.com/products/2314)
