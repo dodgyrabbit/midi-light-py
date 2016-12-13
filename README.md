@@ -15,7 +15,7 @@ The project was developed on Linux but pretty sure you can make it work on Windo
 * [3V-5V Level shifter](https://www.adafruit.com/products/1787) - The RPI GIO pins are 3.3V but the DotStar LED strip expects 5V. Use this level shifter to compensate.
 * [USB-MIDI interface] (http://www.ebay.com/itm/New-USB-IN-OUT-MIDI-Interface-Cable-Converter-to-PC-Music-Keyboard-Adapter-Cord-/361501225810) - This cheap interface seems to work just fine.
 
-## Wall mout
+## Wall mount
 * A wood light fixture that houses the RPI and LED lights.
 * The fixture appears to "float" mid air with LED strip lighting from the top.
 * Power (for RPI and LED strip) and MIDI cables connects to the fixture.
