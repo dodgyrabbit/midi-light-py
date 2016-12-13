@@ -1,5 +1,6 @@
 # midi-light-py
 An LED strip controlled by a Raspberry PI and MIDI keyboard.
+The side motivation for this was to learn Python, as I've never done any Python projects.
 
 # Overview
 Add some lighting effects to your music, by attaching an LED strip and Raspberry PI to your MIDI keyboard.
@@ -52,6 +53,8 @@ you're golden. The **USB2.0-MIDI MIDI 1** is what you want to see.
 #Installation
 
 TODO Add proper install instructions here.
+
+This repository uses Git submodules. If the /lib folder is empty, use the commands below to update. Newer versions of Git automatically pulls them during initial clone.
 
 ```
 git clone https://github.com/dodgyrabbit/midi-light-py
