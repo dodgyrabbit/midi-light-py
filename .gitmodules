@@ -1,3 +1,6 @@
 [submodule "lib/mido"]
 	path = lib/mido
 	url = https:///github.com/olemb/mido.git
+[submodule "lib/Adafruit_DotStar_Pi"]
+	path = lib/Adafruit_DotStar_Pi
+	url = https:///github.com/adafruit/Adafruit_DotStar_Pi
