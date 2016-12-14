@@ -2,7 +2,7 @@
 The main beast.
 """
 
-from Mock_DotStar import Adafruit_DotStar
+from lib.Mock_DotStar import Adafruit_DotStar
 import time
 
 strip = Adafruit_DotStar(88)
