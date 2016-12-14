@@ -1,5 +1,5 @@
 """
-The main beast.
+The main beast is alive.
 """
 
 from lib.Mock_DotStar import Adafruit_DotStar
