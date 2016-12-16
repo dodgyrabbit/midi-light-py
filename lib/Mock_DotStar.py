@@ -3,7 +3,7 @@ A drop in replacment for the Adafruit_DotStar module.
 It allows me to to visualize what the LED strip may look like, without actually having one.
 """
 
-from graphics import GraphWin, Circle, Point, color_rgb
+from lib.graphics import GraphWin, Circle, Point, color_rgb
 
 class Adafruit_DotStar:
     "A mock implementation of the Adafruit_DotStart that simulates LEDs in the UI"
@@ -16,17 +16,17 @@ class Adafruit_DotStar:
     __leds = []
 
     def __init__(self, numPixels):
-        print "Inside initializer"
+        print("Inside initializer")
         self.__numPixels = numPixels
         self.__pixels = [0] * numPixels
-        print self.__pixels
+        print(self.__pixels)
 
     def getPixel(self, index):
-        print "getPixel called in Mock_DotStar"
+        print("getPixel called in Mock_DotStar")
         return self.__pixels(index)
 
     def begin(self):
-        print "begin called in Mock_DotStar"
+        print( "begin called in Mock_DotStar")
         # Width of window is the number of keys * (diameter + spacing) and then add a diameter on each side for spacing
         self.__win = GraphWin("PianoPy", self. __numPixels * self.__LED_RADIUS * 2 +  self.__numPixels * (self.__LED_RADIUS/2) + 4 * self.__LED_RADIUS, self.__WINDOW_HEIGHT)
         x = 2 * self.__LED_RADIUS
@@ -44,7 +44,7 @@ class Adafruit_DotStar:
             x += self.__LED_RADIUS * 2 + self.__LED_RADIUS / 2
 
     def setBrightness(self, brightness):
-        print "setBrightness called in Mock_DotStar"
+        print("setBrightness called in Mock_DotStar")
 
     def setPixelColorRGB(self, index, r, g, b):
         self.__pixels[index] = b + g << 8 + r << 16
@@ -53,7 +53,7 @@ class Adafruit_DotStar:
         self.__pixels[index] = color
 
     def clear(self):
-        print "Clearing strip data"
+        print("Clearing strip data")
         # Set strip data to 'off' (just clears buffer, does not write to strip)
         self.__pixels = [0] * self.__numPixels
 
