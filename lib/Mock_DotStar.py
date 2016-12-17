@@ -9,29 +9,29 @@ class Adafruit_DotStar:
     "A mock implementation of the Adafruit_DotStart that simulates LEDs in the UI"
 
     _LED_RADIUS = 5
-    __WINDOW_HEIGHT = 300
-    __win = None
-    __pixels = None
-    __numPixels = 0
-    __leds = []
+    _WINDOW_HEIGHT = 300
+    _win = None
+    _pixels = None
+    _numPixels = 0
+    _leds = []
 
     def __init__(self, numPixels):
         print("Inside initializer")
-        self.__numPixels = numPixels
-        self.__pixels = [0] * numPixels
-        print(self.__pixels)
+        self._numPixels = numPixels
+        self._pixels = [0] * numPixels
+        print(self._pixels)
 
     def getPixel(self, index):
         print("getPixel called in Mock_DotStar")
-        return self.__pixels(index)
+        return self._pixels(index)
 
     def begin(self):
         print( "begin called in Mock_DotStar")
         # Width of window is the number of keys * (diameter + spacing) and then add a diameter on each side for spacing
-        self.__win = GraphWin("PianoPy", self. __numPixels * self._LED_RADIUS * 2 +  self.__numPixels * (self._LED_RADIUS/2) + 4 * self._LED_RADIUS, self.__WINDOW_HEIGHT)
+        self._win = GraphWin("PianoPy", self. _numPixels * self._LED_RADIUS * 2 +  self._numPixels * (self._LED_RADIUS/2) + 4 * self._LED_RADIUS, self._WINDOW_HEIGHT)
         x = 2 * self._LED_RADIUS
-        y = self.__WINDOW_HEIGHT // 2
-        for pixel in self.__pixels:
+        y = self._WINDOW_HEIGHT // 2
+        for pixel in self._pixels:
             c = Circle(Point(x, y), self._LED_RADIUS)
 
             b = pixel & 255
@@ -39,26 +39,26 @@ class Adafruit_DotStar:
             r = (pixel >> 16) & 255
             c.setFill(color_rgb(r, g, b))
 
-            c.draw(self.__win)
-            self.__leds.append(c)
+            c.draw(self._win)
+            self._leds.append(c)
             x += self._LED_RADIUS * 2 + self._LED_RADIUS / 2
 
     def setBrightness(self, brightness):
         print("setBrightness called in Mock_DotStar")
 
     def setPixelColorRGB(self, index, r, g, b):
-        self.__pixels[index] = b + (g << 8) + (r << 16)
+        self._pixels[index] = b + (g << 8) + (r << 16)
 
     def setPixelColor(self, index, color):
-        self.__pixels[index] = color
+        self._pixels[index] = color
 
     def clear(self):
         print("Clearing strip data")
         # Set strip data to 'off' (just clears buffer, does not write to strip)
-        self.__pixels = [0] * self.__numPixels
+        self._pixels = [0] * self._numPixels
 
     def show(self):
-        for led, pixel in zip(self.__leds, self.__pixels):
+        for led, pixel in zip(self._leds, self._pixels):
             b = pixel & 255
             g = (pixel >> 8) & 255
             r = (pixel >> 16) & 255
