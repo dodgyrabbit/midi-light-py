@@ -41,6 +41,7 @@ class Adafruit_DotStar:
         print("setBrightness called in Mock_DotStar")
 
     def setPixelColorRGB(self, index, r, g, b):
+        # TODO: have one function and parameter count - this way we can have parity with the original library
         self._pixels[index] = _rgb_to_int(r, g, b)
 
     def setPixelColor(self, index, color):

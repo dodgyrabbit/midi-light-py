@@ -13,6 +13,9 @@ PIANO_KEYS = 88
 # The first note (far left) on your keyboard
 FIRST_MIDI_NOTE = 21
 
+DATAPIN = 10
+CLOCKPIN = 11
+
 
 def color_blend(a, b):
     """Performs a Screen blend on RGB color tuples, a and b"""
@@ -24,7 +27,8 @@ def main():
     animations = []
     leds = [(0, 0, 0)] * PIANO_KEYS
 
-    strip = Adafruit_DotStar(PIANO_KEYS)
+    # This overload uses SPI
+    strip = Adafruit_DotStar(PIANO_KEYS, 12000000)
     strip.begin()
     strip.show()
 
@@ -49,7 +53,10 @@ def main():
             strip.setPixelColorRGB(i, r, g, b)
 
         strip.show()
-        time.sleep(0.05)
+        
+        # Experiment to see how long we need to sleep - it seems that this may cause problems
+        # if too short
+        time.sleep(0.1)
 
         if randint(0,20)==0:
 
@@ -70,7 +77,7 @@ def main():
 def strand_test():
     """ Basically the same as the Adafruit stand test """
 
-    strip = Adafruit_DotStar(PIANO_KEYS)
+    strip = Adafruit_DotStar(PIANO_KEYS, DATAPIN, CLOCKPIN)
     strip.begin()
     strip.show()
 
