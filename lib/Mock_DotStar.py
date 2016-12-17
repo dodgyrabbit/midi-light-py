@@ -10,15 +10,13 @@ class Adafruit_DotStar:
 
     _LED_RADIUS = 5
     _WINDOW_HEIGHT = 300
-    _win = None
-    _pixels = None
-    _numPixels = 0
-    _leds = []
 
     def __init__(self, numPixels):
         print("Inside initializer")
         self._numPixels = numPixels
         self._pixels = [0] * numPixels
+        self._win = None
+        self._leds = []
         print(self._pixels)
 
     def getPixel(self, index):
