@@ -8,7 +8,7 @@ from lib.graphics import GraphWin, Circle, Point, color_rgb
 class Adafruit_DotStar:
     "A mock implementation of the Adafruit_DotStart that simulates LEDs in the UI"
 
-    __LED_RADIUS = 5
+    _LED_RADIUS = 5
     __WINDOW_HEIGHT = 300
     __win = None
     __pixels = None
@@ -28,11 +28,11 @@ class Adafruit_DotStar:
     def begin(self):
         print( "begin called in Mock_DotStar")
         # Width of window is the number of keys * (diameter + spacing) and then add a diameter on each side for spacing
-        self.__win = GraphWin("PianoPy", self. __numPixels * self.__LED_RADIUS * 2 +  self.__numPixels * (self.__LED_RADIUS/2) + 4 * self.__LED_RADIUS, self.__WINDOW_HEIGHT)
-        x = 2 * self.__LED_RADIUS
+        self.__win = GraphWin("PianoPy", self. __numPixels * self._LED_RADIUS * 2 +  self.__numPixels * (self._LED_RADIUS/2) + 4 * self._LED_RADIUS, self.__WINDOW_HEIGHT)
+        x = 2 * self._LED_RADIUS
         y = self.__WINDOW_HEIGHT // 2
         for pixel in self.__pixels:
-            c = Circle(Point(x, y), self.__LED_RADIUS)
+            c = Circle(Point(x, y), self._LED_RADIUS)
 
             b = pixel & 255
             g = (pixel >> 8) & 255
@@ -41,7 +41,7 @@ class Adafruit_DotStar:
 
             c.draw(self.__win)
             self.__leds.append(c)
-            x += self.__LED_RADIUS * 2 + self.__LED_RADIUS / 2
+            x += self._LED_RADIUS * 2 + self._LED_RADIUS / 2
 
     def setBrightness(self, brightness):
         print("setBrightness called in Mock_DotStar")
