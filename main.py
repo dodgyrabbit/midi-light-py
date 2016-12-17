@@ -42,19 +42,23 @@ def main():
             for i, frame_pixel in enumerate(new_frame):
                 leds[i] = color_blend(leds[i], frame_pixel)
 
-        animations = [x for x in animations if not x.is_complete]
+        animations = [x for x in animations if not x.is_complete()]
 
         for i, pixel in enumerate(leds):
             r, g, b = (pixel)
             strip.setPixelColorRGB(i, r, g, b)
 
         strip.show()
-        time.sleep(0.1)
+        time.sleep(0.05)
 
-        # Here we would get a key press
-        key_pressed = randint(0,PIANO_KEYS-1)
+        if randint(0,20)==0:
 
-        animations.append(animation.KeyPressAnimation(leds, key_pressed))
+            # Here we would get a key press
+            key_pressed = randint(0,PIANO_KEYS-1)
+
+            #animations.append(animation.KeyPressAnimation(leds, key_pressed))
+            animations.append(animation.RunLeftAnimation(leds, key_pressed))
+        
 
 
 # Process all animations and write them into LED buffer.
