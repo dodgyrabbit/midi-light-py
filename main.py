@@ -31,7 +31,11 @@ def main():
     while True:
 
         # Apply an optional filter (default is to black out LEDs). For now, directly clear the buffer
-        leds = [(0, 0, 0)] * PIANO_KEYS
+        #leds = [(0, 0, 0)] * PIANO_KEYS
+
+        for i, pixel in enumerate(leds):
+            r, g, b = (pixel)
+            leds[i] = (int(r/1.2), int(g/1.2), int(b/1.2))
 
         for current_animation in animations:
             new_frame = current_animation.get_frame()
