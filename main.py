@@ -3,8 +3,8 @@ The main beast is alive.
 """
 
 import time
-import animation
 from random import randint
+import animation
 from lib.Mock_DotStar import Adafruit_DotStar
 
 # How many keys there are on (your) piano/keyboard
@@ -51,15 +51,13 @@ def main():
         strip.show()
         time.sleep(0.05)
 
-        if randint(0,20)==0:
+        if randint(0, 20) == 0:
 
             # Here we would get a key press
-            key_pressed = randint(0,PIANO_KEYS-1)
+            key_pressed = randint(0, PIANO_KEYS-1)
 
             #animations.append(animation.KeyPressAnimation(leds, key_pressed))
             animations.append(animation.RunLeftAnimation(leds, key_pressed))
-        
-
 
 # Process all animations and write them into LED buffer.
 # Destroy animations that are complete.
