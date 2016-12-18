@@ -5,7 +5,7 @@ The main beast is alive.
 import time
 import animation
 from random import randint
-from lib.Mock_DotStar import Adafruit_DotStar
+from lib.dotstar import Adafruit_DotStar
 
 # How many keys there are on (your) piano/keyboard
 PIANO_KEYS = 88
@@ -28,43 +28,46 @@ def main():
     leds = [(0, 0, 0)] * PIANO_KEYS
 
     # This overload uses SPI
-    strip = Adafruit_DotStar(PIANO_KEYS, 12000000)
+    strip = Adafruit_DotStar(PIANO_KEYS, 12000000, order='bgr')
     strip.begin()
     strip.show()
 
     while True:
 
         # Apply an optional filter (default is to black out LEDs). For now, directly clear the buffer
-        #leds = [(0, 0, 0)] * PIANO_KEYS
+        leds = [(0, 0, 0)] * PIANO_KEYS
 
-        for i, pixel in enumerate(leds):
-            r, g, b = (pixel)
-            leds[i] = (int(r/1.2), int(g/1.2), int(b/1.2))
+        #for i, pixel in enumerate(leds):
+        #    r, g, b = (pixel)
+        #    leds[i] = (int(r/1.2), int(g/1.2), int(b/1.2))
+        
 
         for current_animation in animations:
             new_frame = current_animation.get_frame()
             for i, frame_pixel in enumerate(new_frame):
-                leds[i] = color_blend(leds[i], frame_pixel)
+		r, g, b = (frame_pixel)
+		if r > 0:
+                    leds[i] = color_blend(leds[i], frame_pixel)
 
         animations = [x for x in animations if not x.is_complete()]
 
         for i, pixel in enumerate(leds):
             r, g, b = (pixel)
-            strip.setPixelColorRGB(i, r, g, b)
+            strip.setPixelColor(i, r, g, b)
 
         strip.show()
         
         # Experiment to see how long we need to sleep - it seems that this may cause problems
         # if too short
-        time.sleep(0.1)
+        #time.sleep(0.1)
 
         if randint(0,20)==0:
 
             # Here we would get a key press
             key_pressed = randint(0,PIANO_KEYS-1)
 
-            #animations.append(animation.KeyPressAnimation(leds, key_pressed))
-            animations.append(animation.RunLeftAnimation(leds, key_pressed))
+            animations.append(animation.KeyPressAnimation(leds, key_pressed))
+            #animations.append(animation.RunLeftAnimation(leds, key_pressed))
         
 
 

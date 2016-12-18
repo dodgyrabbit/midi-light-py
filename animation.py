@@ -24,17 +24,19 @@ class KeyPressAnimation(Animation):
         Animation.__init__(self, leds)
         self.__key_pressed = key_pressed
         self.__leds = leds
+	self._count = 60
 
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
         #self.__leds[self.__key_pressed] = 0xFFFFFF
         leds = [(0, 0, 0)] * 88
         leds[self.__key_pressed] = (255, 255, 255)
+	self._count -= 1
         return leds
 
     def is_complete(self):
         """True if this animation is complete and can be removed"""
-        return True
+        return self._count < 0
 
 class RunLeftAnimation(Animation):
     """Simple animation that happens when you press a key"""
