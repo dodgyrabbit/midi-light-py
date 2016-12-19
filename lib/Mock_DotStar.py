@@ -11,7 +11,7 @@ class Adafruit_DotStar:
     _LED_RADIUS = 5
     _WINDOW_HEIGHT = 300
 
-    def __init__(self, numPixels):
+    def __init__(self, numPixels, a=None, order=None):
         print("Inside initializer")
         self._numPixels = numPixels
         self._pixels = [0] * numPixels
@@ -31,7 +31,7 @@ class Adafruit_DotStar:
         y = self._WINDOW_HEIGHT // 2
         for pixel in self._pixels:
             c = Circle(Point(x, y), self._LED_RADIUS)
-            r, g, b = _int_to_rgb(pixel)
+            r, g, b = ((pixel >> 16) & 255, (pixel >> 8) & 255, pixel & 255)
             c.setFill(color_rgb(r, g, b))
             c.draw(self._win)
             self._leds.append(c)
@@ -42,7 +42,7 @@ class Adafruit_DotStar:
 
     def setPixelColorRGB(self, index, r, g, b):
         # TODO: have one function and parameter count - this way we can have parity with the original library
-        self._pixels[index] = _rgb_to_int(r, g, b)
+        self._pixels[index] =  b + (g << 8) + (r << 16)
 
     def setPixelColor(self, index, color):
         self._pixels[index] = color
@@ -52,14 +52,8 @@ class Adafruit_DotStar:
         # Set strip data to 'off' (just clears buffer, does not write to strip)
         # TODO: Optimize - just set the values to 0 so we don't make a list each time. Not sure what the best way in Python is
         self._pixels = [0] * self._numPixels
-        
-    def _rgb_to_int(r, g, b):
-        return  b + (g << 8) + (r << 16)
-    
-    def _int_to_rgb(color):
-        return ((pixel >> 16) & 255, (pixel >> 8) & 255, pixel & 255)
 
     def show(self):
         for led, pixel in zip(self._leds, self._pixels):
-            r, g, b = _int_to_rgb(pixel)
+            r, g, b = ((pixel >> 16) & 255, (pixel >> 8) & 255, pixel & 255)
             led.setFill(color_rgb(r, g, b))
