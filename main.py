@@ -6,21 +6,31 @@ import time
 import animation 
 import mido
 from random import randint
-#from lib.dotstar import Adafruit_DotStar
+from lib.dotstar import Adafruit_DotStar
 #from lib.Adafruit_DotStar_Pi.dotstar import Adafruit_DotStar
-from lib.Mock_DotStar import Adafruit_DotStar
+#from lib.Mock_DotStar import Adafruit_DotStar
 
 # How many keys there are on (your) piano/keyboard
 PIANO_KEYS = 88
+
+# The extra lights at the bottom
+STATUS_LIGHTS = 32
+
+ALL_LIGHTS = PIANO_KEYS + STATUS_LIGHTS
 
 # The first note (far left) on your keyboard
 FIRST_MIDI_NOTE = 21
 
 def detect_usb_midi():
-	"""Returns the first device with USB in the name. None otherwise."""
-	midi_devices =  mido.Backend().get_input_names()
-	first_usb_device = next((x for x in midi_devices if 'USB' in x), None)
-	return first_usb_device
+    """Returns the first device with USB in the name. None otherwise."""
+    midi_devices =  mido.Backend().get_input_names()
+    first_usb_device = next((x for x in midi_devices if 'USB' in x), None)
+
+    if first_usb_device is None:
+        print("Trying name 'MIDI 1'")
+        first_usb_device = next((x for x in midi_devices if 'MIDI 1' in x), None)
+	
+    return first_usb_device
 
 
 def color_blend(a, b):
@@ -41,13 +51,16 @@ def main():
         print("No MIDI device detected")
         midi_input = None
 
+    print("Starting main loop...")
+
     # This overload uses SPI
-    strip = Adafruit_DotStar(PIANO_KEYS, 12000000, order='bgr')
+    strip = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
     strip.begin()
     strip.show()
 
-    while True:
-        try:
+    try:
+
+        while True:
 
             # Apply an optional filter (default is to black out LEDs). For now, directly clear the buffer
             leds = [(0, 0, 0)] * PIANO_KEYS
@@ -56,19 +69,16 @@ def main():
             #    r, g, b = (pixel)
             #    leds[i] = (int(r/1.2), int(g/1.2), int(b/1.2))
 
-
             for current_animation in animations:
                 new_frame = current_animation.get_frame()
                 for i, frame_pixel in enumerate(new_frame):
                     r, g, b = (frame_pixel)
                     if r > 0:
                         leds[i] = color_blend(leds[i], frame_pixel)
-
             animations = [x for x in animations if not x.is_complete()]
-
             for i, pixel in enumerate(leds):
                 r, g, b = (pixel)
-                strip.setPixelColorRGB(i, r, g, b)
+                strip.setPixelColor(i, r, g, b)
 
             strip.show()
 
@@ -90,20 +100,17 @@ def main():
                     animations.append(animation.KeyPressAnimation(leds, key_pressed))
                     #animations.append(animation.RunLeftAnimation(leds, key_pressed))
 
-        except KeyboardInterrupt:
-            if midi_input:
-                midi_input.close()
-
-# Process all animations and write them into LED buffer.
-# Destroy animations that are complete.
-# Update the LED display.
-# Process any inputs and create any new animations as needed.
-# Sleep to achieve the desired frame rate.
+    except KeyboardInterrupt:
+        print("Exiting...")
+        strip.clear()
+        strip.show()
+        if midi_input:
+            midi_input.close()
 
 def strand_test():
     """ Basically the same as the Adafruit stand test """
 
-    strip = Adafruit_DotStar(PIANO_KEYS, 12000000, order='bgr')
+    strip = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
     strip.begin()
     strip.show()
 
@@ -111,27 +118,24 @@ def strand_test():
     tail = -10                              # Index of last 'off' pixel
     color = 0xFF0000                        # 'On' color (starts red)
 
-    while True:                             # Loop forever
+    counter = ALL_LIGHTS * 3 + 10
+    while counter > 0:                             # Loop forever
         strip.setPixelColor(head, color)    # Turn on 'head' pixel
         strip.setPixelColor(tail, 0)        # Turn off 'tail'
         strip.show()                        # Refresh strip
-        time.sleep(1.0 / 50)                # Pause 20 milliseconds (~50 fps)
+        time.sleep(1.0 / 100)                # Pause 20 milliseconds (~50 fps)
         head += 1                           # Advance head position
-        if head >= PIANO_KEYS:              # Off end of strip?
+        if head >= ALL_LIGHTS:              # Off end of strip?
             head = 0                        # Reset to start
             color >>= 8                     # Red->green->blue->black
             if color == 0:
                 color = 0xFF0000            # If black, reset to red
         tail += 1                           # Advance tail position
-        if tail >= PIANO_KEYS:
+        if tail >= ALL_LIGHTS:
             tail = 0                        # Off end? Reset
+        counter -= 1
 
+
+strand_test()
 main()
 
-# try:
-#     while True:
-#         time.sleep(1)
-
-# except KeyboardInterrupt:
-#     ## Close mock library (which should close window)
-#     pass
