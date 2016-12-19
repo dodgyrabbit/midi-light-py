@@ -97,7 +97,8 @@ def main():
                     # Here we would get a key press
                     key_pressed = randint(0,PIANO_KEYS-1)
 
-                    animations.append(animation.KeyPressAnimation(leds, key_pressed))
+                    animations.append(animation.PressureKeyPressAnimation(leds, key_pressed, randint(1,192)))
+                    #animations.append(animation.KeyPressAnimation(leds, key_pressed))
                     #animations.append(animation.RunLeftAnimation(leds, key_pressed))
 
     except KeyboardInterrupt:

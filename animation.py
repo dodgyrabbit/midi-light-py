@@ -15,6 +15,29 @@ class Animation:
         """True if this animation is complete and can be removed"""
         return False
 
+class PressureKeyPressAnimation(Animation):
+    """Simple animation that happens when you press a key. It is pressure sensitive."""
+
+    def __init__(self, leds, key_pressed, velocity):
+        """Initializes a new PressureKeyPressAnimation instance"""
+        Animation.__init__(self, leds)
+        self.__key_pressed = key_pressed
+        self.__leds = leds
+	self._count = 120
+        self._velocity = velocity
+
+    def get_frame(self):
+        """Return an array of integers representing the current state of the animation"""
+        leds = [(0, 0, 0)] * 88
+        leds[self.__key_pressed] = (self._velocity, self._velocity, self._velocity)
+	self._count -= 1
+	if self._count % 3 == 0:
+	    self._velocity = int(self._velocity * 0.9)
+        return leds
+
+    def is_complete(self):
+        """True if this animation is complete and can be removed"""
+        return self._count < 0
 
 class KeyPressAnimation(Animation):
     """Simple animation that happens when you press a key"""
@@ -28,7 +51,6 @@ class KeyPressAnimation(Animation):
 
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
-        #self.__leds[self.__key_pressed] = 0xFFFFFF
         leds = [(0, 0, 0)] * 88
         leds[self.__key_pressed] = (255, 255, 255)
 	self._count -= 1
@@ -59,7 +81,6 @@ class RunLeftAnimation(Animation):
 
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
-        #self.__leds[self.__key_pressed] = 0xFFFFFF
         leds = [(0, 0, 0)] * 88
         leds[self.__key_pressed] = self.__color
         self.__key_pressed -= 1
