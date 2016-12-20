@@ -2,13 +2,15 @@
 The main beast is alive.
 """
 
+from __future__ import print_function
+
 import time
 import animation 
 import mido
 from random import randint
-from lib.dotstar import Adafruit_DotStar
+#from lib.dotstar import Adafruit_DotStar
 #from lib.Adafruit_DotStar_Pi.dotstar import Adafruit_DotStar
-#from lib.Mock_DotStar import Adafruit_DotStar
+from lib.Mock_DotStar import Adafruit_DotStar
 
 # How many keys there are on (your) piano/keyboard
 PIANO_KEYS = 88
@@ -23,15 +25,14 @@ FIRST_MIDI_NOTE = 21
 
 def detect_usb_midi():
     """Returns the first device with USB in the name. None otherwise."""
-    midi_devices =  mido.Backend().get_input_names()
+    midi_devices = mido.Backend().get_input_names()
     first_usb_device = next((x for x in midi_devices if 'USB' in x), None)
 
     if first_usb_device is None:
         print("Trying name 'MIDI 1'")
         first_usb_device = next((x for x in midi_devices if 'MIDI 1' in x), None)
-	
-    return first_usb_device
 
+    return first_usb_device
 
 def color_blend(a, b):
     """Performs a Screen blend on RGB color tuples, a and b"""
@@ -53,10 +54,17 @@ def main():
 
     print("Starting main loop...")
 
+    if midi_input is None:
+        configuration = {'mode' : 'demo'}
+    else:
+        configuration = {'mode' : 'midi'}
+
     # This overload uses SPI
     strip = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
     strip.begin()
     strip.show()
+
+    chord = set()
 
     try:
 
@@ -64,6 +72,13 @@ def main():
 
             # Apply an optional filter (default is to black out LEDs). For now, directly clear the buffer
             leds = [(0, 0, 0)] * PIANO_KEYS
+
+            if set([0, 1, 2]).issubset(chord):
+                # Reconfigure mode - set bottom pixels to RED
+                for pixel in range(PIANO_KEYS, ALL_LIGHTS):
+                    strip.setPixelColor(pixel, 0xFF0000)
+                # TODO: Now reconfigure
+                
 
             #for i, pixel in enumerate(leds):
             #    r, g, b = (pixel)
@@ -86,18 +101,25 @@ def main():
             # if too short
             time.sleep(0.01)
 
-            if midi_input:
+            if configuration['mode'] == 'midi':
                 for message in midi_input.iter_pending():
                     print(message)
                     if message.type == 'note_on':
-                        animations.append(animation.KeyPressAnimation(leds, message.note - FIRST_MIDI_NOTE))
-            else:
+                        note = message.note - FIRST_MIDI_NOTE
+                        chord.add(note)
+                        animations.append(animation.PressureKeyPressAnimation(leds, note, message.velocity))
+                    if message.type == 'note_off':
+                        note = message.note - FIRST_MIDI_NOTE
+                        if note in chord:
+                            chord.remove(note)
+
+            if configuration['mode'] == 'demo':
                 if randint(0, 20) == 0:
 
                     # Here we would get a key press
-                    key_pressed = randint(0,PIANO_KEYS-1)
+                    key_pressed = randint(0, PIANO_KEYS-1)
 
-                    animations.append(animation.PressureKeyPressAnimation(leds, key_pressed, randint(1,192)))
+                    animations.append(animation.PressureKeyPressAnimation(leds, key_pressed, randint(1, 192)))
                     #animations.append(animation.KeyPressAnimation(leds, key_pressed))
                     #animations.append(animation.RunLeftAnimation(leds, key_pressed))
 
