@@ -40,12 +40,11 @@ class Adafruit_DotStar:
     def setBrightness(self, brightness):
         print("setBrightness called in Mock_DotStar")
 
-    def setPixelColorRGB(self, index, r, g, b):
-        # TODO: have one function and parameter count - this way we can have parity with the original library
-        self._pixels[index] =  b + (g << 8) + (r << 16)
-
-    def setPixelColor(self, index, color):
-        self._pixels[index] = color
+    def setPixelColor(self, index, color_or_r, g = None, b = None):
+        if g is None:
+            self._pixels[index] = color_or_r
+        else:
+            self._pixels[index] =  b + (g << 8) + (color_or_r << 16)
 
     def clear(self):
         print("Clearing strip data")
