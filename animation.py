@@ -1,6 +1,9 @@
 """ The various classes relating to animations """
 
 from random import randint
+import time
+
+milliseconds = lambda: int(round(time.time() * 1000))
 
 class Animation:
     """The base class for any animation"""
@@ -23,21 +26,22 @@ class PressureKeyPressAnimation(Animation):
         Animation.__init__(self, leds)
         self.__key_pressed = key_pressed
         self.__leds = leds
-	self._count = 120
+        self._count = 0
         self._velocity = velocity
+        self._end = milliseconds() + 3000
 
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
         leds = [(0, 0, 0)] * 88
         leds[self.__key_pressed] = (self._velocity, self._velocity, self._velocity)
-	self._count -= 1
-	if self._count % 3 == 0:
-	    self._velocity = int(self._velocity * 0.9)
+        self._count += 1
+        if self._count % 3 == 0:
+            self._velocity = int(self._velocity * 0.9)
         return leds
 
     def is_complete(self):
         """True if this animation is complete and can be removed"""
-        return self._count < 0
+        return milliseconds() > self._end
 
 class KeyPressAnimation(Animation):
     """Simple animation that happens when you press a key"""
@@ -47,13 +51,13 @@ class KeyPressAnimation(Animation):
         Animation.__init__(self, leds)
         self.__key_pressed = key_pressed
         self.__leds = leds
-	self._count = 60
+        self._count = 60
 
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
         leds = [(0, 0, 0)] * 88
         leds[self.__key_pressed] = (255, 255, 255)
-	self._count -= 1
+        self._count -= 1
         return leds
 
     def is_complete(self):
@@ -68,7 +72,7 @@ class RunLeftAnimation(Animation):
         Animation.__init__(self, leds)
         self.__key_pressed = key_pressed
         self.__leds = leds
-        r = randint(0,3)
+        r = randint(0, 3)
         if r == 0:
             self.__color = (255, 0, 0)
         if r == 1:
@@ -77,7 +81,6 @@ class RunLeftAnimation(Animation):
             self.__color = (255, 255, 0)
         if r == 3:
             self.__color = (0, 255, 255)
-            
 
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
