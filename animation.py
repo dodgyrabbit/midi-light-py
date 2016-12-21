@@ -18,6 +18,39 @@ class Animation:
         """True if this animation is complete and can be removed"""
         return False
 
+class FireAnimation(Animation):
+    def __init__(self):
+        """ Fire animation """
+        self._lights = []
+	self._r = 255
+        self._g = 255 - 40
+        self._b = 40
+        self._end = 0
+
+    def get_frame(self):
+        if (milliseconds() > self._end):
+            self._end = milliseconds() + 50
+            self._lights = []
+            for i in range(0, 88):
+                flicker = randint(0, 150)
+                r1 = self._r - flicker
+                g1 = self._g - flicker
+                b1 = self._b - flicker
+                if r1 < 0:
+                    r1 = 0
+                if g1 < 0:
+                    g1 = 0
+                if b1 < 0:
+                    b1 = 0
+                self._lights.append((r1, g1, b1))
+        
+        return self._lights
+
+    def is_complete(self):
+        return False
+
+
+
 class PressureKeyPressAnimation(Animation):
     """Simple animation that happens when you press a key. It is pressure sensitive."""
 
@@ -28,7 +61,7 @@ class PressureKeyPressAnimation(Animation):
         self.__leds = leds
         self._count = 0
         self._velocity = velocity
-        self._end = milliseconds() + 3000
+        self._end = milliseconds() + 1000
 
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
@@ -36,7 +69,7 @@ class PressureKeyPressAnimation(Animation):
         leds[self.__key_pressed] = (self._velocity, self._velocity, self._velocity)
         self._count += 1
         if self._count % 3 == 0:
-            self._velocity = int(self._velocity * 0.9)
+            self._velocity = int(self._velocity * 0.7)
         return leds
 
     def is_complete(self):

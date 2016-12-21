@@ -8,9 +8,9 @@ import time
 import animation 
 import mido
 from random import randint
-#from lib.dotstar import Adafruit_DotStar
+from lib.dotstar import Adafruit_DotStar
 #from lib.Adafruit_DotStar_Pi.dotstar import Adafruit_DotStar
-from lib.Mock_DotStar import Adafruit_DotStar
+#from lib.Mock_DotStar import Adafruit_DotStar
 
 # How many keys there are on (your) piano/keyboard
 PIANO_KEYS = 88
@@ -66,6 +66,9 @@ def main():
 
     chord = set()
 
+    # Just a quick hack to test it
+    #animations.append(animation.FireAnimation())
+
     try:
 
         while True:
@@ -73,12 +76,60 @@ def main():
             # Apply an optional filter (default is to black out LEDs). For now, directly clear the buffer
             leds = [(0, 0, 0)] * PIANO_KEYS
 
+            if set([0, 1]).issubset(chord):
+                print("Secret chord pressed")
+                color = None
+                if 2 in chord:
+                    print("Red status lights")
+                    color = 0xFF0000
+                if 3 in chord:
+                    color = 0x00FF00
+                if 4 in chord:
+                    color = 0x0000FF
+                if 5 in chord:
+                    color = 0xFFFFFF
+                if 6 in chord:
+                    color = 0xFFFC7F
+                if 7 in chord:
+                    color = 0x000000
+
+                if not color is None:
+                    for pixel in range(PIANO_KEYS, ALL_LIGHTS):
+                        strip.setPixelColor(pixel, color)
+             
+
+
+            """ 
+
             if set([0, 1, 2]).issubset(chord):
                 # Reconfigure mode - set bottom pixels to RED
                 for pixel in range(PIANO_KEYS, ALL_LIGHTS):
                     strip.setPixelColor(pixel, 0xFF0000)
+
+		if configuration['mode'] == 'midi':
+                    configuration['mode'] = 'demo'
+                else:
+                    configuration['mode'] = 'midi'
+
+            if set([0, 1, 3]).issubset(chord):
+                for pixel in range(PIANO_KEYS, ALL_LIGHTS):
+                    strip.setPixelColor(pixel, 0x00FF00)
+
+            if set([0, 1, 4]).issubset(chord):
+                for pixel in range(PIANO_KEYS, ALL_LIGHTS):
+                    strip.setPixelColor(pixel, 0x0000FF)
+ 
+            if set([0, 1, 5]).issubset(chord):
+                for pixel in range(PIANO_KEYS, ALL_LIGHTS):
+                    strip.setPixelColor(pixel, 0xFFFFFF)
+ 		
+            if set([0, 1, 6]).issubset(chord):
+                for pixel in range(PIANO_KEYS, ALL_LIGHTS):
+                    strip.setPixelColor(pixel, 0x000000)
+              
                 # TODO: Now reconfigure
-                
+            """
+    
 
             #for i, pixel in enumerate(leds):
             #    r, g, b = (pixel)
@@ -101,13 +152,13 @@ def main():
             # if too short
             time.sleep(0.01)
 
-            if configuration['mode'] == 'midi':
+            if configuration['mode'] == 'midi' or (midi_input is not None):
                 for message in midi_input.iter_pending():
                     print(message)
                     if message.type == 'note_on':
                         note = message.note - FIRST_MIDI_NOTE
                         chord.add(note)
-                        animations.append(animation.PressureKeyPressAnimation(leds, note, message.velocity))
+                        animations.append(animation.PressureKeyPressAnimation(leds, note, message.velocity * 2))
                     if message.type == 'note_off':
                         note = message.note - FIRST_MIDI_NOTE
                         if note in chord:
@@ -159,6 +210,6 @@ def strand_test():
         counter -= 1
 
 
-strand_test()
+#strand_test()
 main()
 
