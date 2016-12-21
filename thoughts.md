@@ -47,3 +47,7 @@ effectively light up a whole bunch of pixels.
 
 Random idea - "bleeding" of light means if I'm at 80% my neighbors are at 40%, their neighbors at 20% etc. If I did this,  it would mean you could in theory keep lighting 
 up more and more pixels by repeatedly hitting one note.
+
+## Remember
+* set/unset tabstospaces in .nanorc file so it will stop screwing up the spacing!
+* set tabsize 4 (the default is 8. Yikes!)
