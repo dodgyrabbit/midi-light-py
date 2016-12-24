@@ -23,6 +23,24 @@ ALL_LIGHTS = PIANO_KEYS + STATUS_LIGHTS
 # The first note (far left) on your keyboard
 FIRST_MIDI_NOTE = 21
 
+gamma = [ \
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,\
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,\
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,\
+    2,  3,  3,  3,  3,  3,  3,  3,  4,  4,  4,  4,  4,  5,  5,  5,\
+    5,  6,  6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  9,  9,  9, 10,\
+   10, 10, 11, 11, 11, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16,\
+   17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25,\
+   25, 26, 27, 27, 28, 29, 29, 30, 31, 32, 32, 33, 34, 35, 35, 36,\
+   37, 38, 39, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 50,\
+   51, 52, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 66, 67, 68,\
+   69, 70, 72, 73, 74, 75, 77, 78, 79, 81, 82, 83, 85, 86, 87, 89,\
+   90, 92, 93, 95, 96, 98, 99,101,102,104,105,107,109,110,112,114,\
+  115,117,119,120,122,124,126,127,129,131,133,135,137,138,140,142,\
+  144,146,148,150,152,154,156,158,160,162,164,167,169,171,173,175,\
+  177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,\
+  215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255 ]
+
 def detect_usb_midi():
     """Returns the first device with USB in the name. None otherwise."""
     midi_devices = mido.Backend().get_input_names()
@@ -44,6 +62,8 @@ def main():
     animations = []
     leds = [(0, 0, 0)] * PIANO_KEYS
 
+    last_key_time = time.time()
+
     usb_device_name = detect_usb_midi()
     if usb_device_name:
         print("Opening {0} port".format(usb_device_name))
@@ -59,6 +79,11 @@ def main():
     else:
         configuration = {'mode' : 'midi'}
 
+    configuration['gamma_correction'] = True
+    configuration['animation'] = 1
+
+    configuration['demo_delay'] = 60
+
     # This overload uses SPI
     strip = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
     strip.begin()
@@ -72,6 +97,11 @@ def main():
     try:
 
         while True:
+    
+            if time.time() - last_key_time > configuration['demo_delay']:
+                configuration['mode'] = 'demo'
+            elif configuration['mode'] == 'demo':
+                configuration['mode'] = 'midi'        
 
             # Apply an optional filter (default is to black out LEDs). For now, directly clear the buffer
             leds = [(0, 0, 0)] * PIANO_KEYS
@@ -96,41 +126,7 @@ def main():
                 if not color is None:
                     for pixel in range(PIANO_KEYS, ALL_LIGHTS):
                         strip.setPixelColor(pixel, color)
-             
-
-
-            """ 
-
-            if set([0, 1, 2]).issubset(chord):
-                # Reconfigure mode - set bottom pixels to RED
-                for pixel in range(PIANO_KEYS, ALL_LIGHTS):
-                    strip.setPixelColor(pixel, 0xFF0000)
-
-		if configuration['mode'] == 'midi':
-                    configuration['mode'] = 'demo'
-                else:
-                    configuration['mode'] = 'midi'
-
-            if set([0, 1, 3]).issubset(chord):
-                for pixel in range(PIANO_KEYS, ALL_LIGHTS):
-                    strip.setPixelColor(pixel, 0x00FF00)
-
-            if set([0, 1, 4]).issubset(chord):
-                for pixel in range(PIANO_KEYS, ALL_LIGHTS):
-                    strip.setPixelColor(pixel, 0x0000FF)
- 
-            if set([0, 1, 5]).issubset(chord):
-                for pixel in range(PIANO_KEYS, ALL_LIGHTS):
-                    strip.setPixelColor(pixel, 0xFFFFFF)
- 		
-            if set([0, 1, 6]).issubset(chord):
-                for pixel in range(PIANO_KEYS, ALL_LIGHTS):
-                    strip.setPixelColor(pixel, 0x000000)
-              
-                # TODO: Now reconfigure
-            """
-    
-
+            
             #for i, pixel in enumerate(leds):
             #    r, g, b = (pixel)
             #    leds[i] = (int(r/1.2), int(g/1.2), int(b/1.2))
@@ -139,11 +135,15 @@ def main():
                 new_frame = current_animation.get_frame()
                 for i, frame_pixel in enumerate(new_frame):
                     r, g, b = (frame_pixel)
-                    if r > 0:
+                    if r > 0 or g > 0 or b > 0:
                         leds[i] = color_blend(leds[i], frame_pixel)
             animations = [x for x in animations if not x.is_complete()]
             for i, pixel in enumerate(leds):
                 r, g, b = (pixel)
+                if configuration['gamma_correction']:
+                    r = gamma[r]
+                    g = gamma[g]
+                    b = gamma[b]
                 strip.setPixelColor(i, r, g, b)
 
             strip.show()
@@ -155,10 +155,12 @@ def main():
             if configuration['mode'] == 'midi' or (midi_input is not None):
                 for message in midi_input.iter_pending():
                     print(message)
+                    last_key_time = time.time()
                     if message.type == 'note_on':
                         note = message.note - FIRST_MIDI_NOTE
                         chord.add(note)
-                        animations.append(animation.PressureKeyPressAnimation(leds, note, message.velocity * 2))
+                        #animations.append(animation.PressureKeyPressAnimation(leds, note, message.velocity * 2))
+                        animations.append(animation.ChristmasKeyPressAnimation(leds, note, message.velocity * 2))
                     if message.type == 'note_off':
                         note = message.note - FIRST_MIDI_NOTE
                         if note in chord:
