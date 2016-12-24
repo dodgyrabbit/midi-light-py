@@ -93,11 +93,6 @@ def main():
 
     print("Starting main loop...")
 
-    #if midi_input is None:
-    #    configuration['mode'] = 'demo'
-    #else:
-    #    configuration['mode'] = 'midi'
-
     configuration['mode'] = 'demo'
     configuration['gamma_correction'] = True
     configuration['animation'] = 1
