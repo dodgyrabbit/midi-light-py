@@ -1,8 +1,9 @@
 """
-The main beast is alive.
+The main midi-light-pi module.
 """
 
 from __future__ import print_function
+from __future__ import division
 
 import time
 import animation 
@@ -61,7 +62,6 @@ def main():
 
     animations = []
     leds = [(0, 0, 0)] * PIANO_KEYS
-
     last_key_time = time.time()
 
     usb_device_name = detect_usb_midi()
@@ -81,18 +81,16 @@ def main():
 
     configuration['gamma_correction'] = True
     configuration['animation'] = 1
-
     configuration['demo_delay'] = 60
+    configuration['status_brightness'] = 255
 
     # This overload uses SPI
     strip = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
     strip.begin()
     strip.show()
 
+    # Used to detect the "secret chord" for controlling various aspects
     chord = set()
-
-    # Just a quick hack to test it
-    #animations.append(animation.FireAnimation())
 
     try:
 
@@ -124,8 +122,21 @@ def main():
                     color = 0x000000
 
                 if not color is None:
+                    # Adjust brightness
+                    color = int(color * (255 / configuration['status_brightness']))
                     for pixel in range(PIANO_KEYS, ALL_LIGHTS):
                         strip.setPixelColor(pixel, color)
+
+                # 15 is the second C note from the left. Toggle brightness down.
+                if 15 in chord:
+                    configuration['status_brightness'] -= 1
+                    if configuration['status_brightness'] < 1:
+                        configuration['status_brightness'] = 1
+                # 16 is the second D note from the left. Toggle brightness up.
+                if 17 in chord:
+                    configuration['status_brightness'] += 1
+                    if configuration['status_brightness'] > 255:
+                        configuration['status_brightness'] = 255
             
             #for i, pixel in enumerate(leds):
             #    r, g, b = (pixel)
