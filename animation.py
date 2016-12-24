@@ -22,7 +22,7 @@ class FireAnimation(Animation):
     def __init__(self):
         """ Fire animation """
         self._lights = []
-	self._r = 255
+    	self._r = 255
         self._g = 255 - 40
         self._b = 40
         self._end = 0
@@ -48,6 +48,40 @@ class FireAnimation(Animation):
 
     def is_complete(self):
         return False
+
+class ChristmasKeyPressAnimation(Animation):
+    """Simple animation that happens when you press a key. It is pressure sensitive."""
+
+    def __init__(self, leds, key_pressed, velocity):
+        """Initializes a new ChristmasKeyPressAnimation instance"""
+        Animation.__init__(self, leds)
+        self.__key_pressed = key_pressed
+        self.__leds = leds
+        self._count = 0
+        self._velocity = velocity
+        self._end = milliseconds() + 1000
+        self._color = randint(0, 2)
+
+    def get_frame(self):
+        """Return an array of integers representing the current state of the animation"""
+        leds = [(0, 0, 0)] * 88
+
+        if self._color == 0: 
+            leds[self.__key_pressed] = (self._velocity, 0, 0)
+        if self._color == 1:
+            leds[self.__key_pressed] = (0, self._velocity, 0)
+        if self._color == 2:
+            leds[self.__key_pressed] = (self._velocity, self._velocity, self._velocity)
+
+        self._count += 1
+        if self._count % 3 == 0:
+            self._velocity = int(self._velocity * 0.9)
+        return leds
+
+    def is_complete(self):
+        """True if this animation is complete and can be removed"""
+        return milliseconds() > self._end
+
 
 
 
