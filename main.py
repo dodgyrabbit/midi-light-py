@@ -42,6 +42,13 @@ gamma = [ \
   177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,\
   215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255 ]
 
+# TODO: Need to refactor this main module into it's own class
+configuration = {}
+# This overload uses SPI
+strip = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
+
+status_color = None
+
 def detect_usb_midi():
     """Returns the first device with USB in the name. None otherwise."""
     midi_devices = mido.Backend().get_input_names()
@@ -57,8 +64,20 @@ def color_blend(a, b):
     """Performs a Screen blend on RGB color tuples, a and b"""
     return (255 - (((255 - a[0]) * (255 - b[0])) >> 8), 255 - (((255 - a[1]) * (255 - b[1])) >> 8), 255 - (((255 - a[2]) * (255 - b[2])) >> 8))
 
+def draw_status(color):
+    if not color is None:
+        # Adjust brightness
+        r, g, b = ((color >> 16) & 255, (color >> 8) & 255, color & 255)
+        r = int(r * (configuration['status_brightness'] / 255))
+        b = int(b * (configuration['status_brightness'] / 255))
+        g = int(g * (configuration['status_brightness'] / 255))
+        color = b + (g << 8) + (r << 16)
+        for pixel in range(PIANO_KEYS, ALL_LIGHTS):
+            strip.setPixelColor(pixel, color)
+
 def main():
     """ The main loop """
+    global status_color
 
     animations = []
     leds = [(0, 0, 0)] * PIANO_KEYS
@@ -74,18 +93,17 @@ def main():
 
     print("Starting main loop...")
 
-    if midi_input is None:
-        configuration = {'mode' : 'demo'}
-    else:
-        configuration = {'mode' : 'midi'}
+    #if midi_input is None:
+    #    configuration['mode'] = 'demo'
+    #else:
+    #    configuration['mode'] = 'midi'
 
+    configuration['mode'] = 'demo'
     configuration['gamma_correction'] = True
     configuration['animation'] = 1
     configuration['demo_delay'] = 60
     configuration['status_brightness'] = 255
 
-    # This overload uses SPI
-    strip = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
     strip.begin()
     strip.show()
 
@@ -106,38 +124,36 @@ def main():
 
             if set([0, 1]).issubset(chord):
                 print("Secret chord pressed")
-                color = None
+
                 if 2 in chord:
                     print("Red status lights")
-                    color = 0xFF0000
+                    status_color = 0xFF0000
                 if 3 in chord:
-                    color = 0x00FF00
+                    status_color = 0x00FF00
                 if 4 in chord:
-                    color = 0x0000FF
+                    status_color = 0x0000FF
                 if 5 in chord:
-                    color = 0xFFFFFF
+                    status_color = 0xFFFFFF
                 if 6 in chord:
-                    color = 0xFFFC7F
+                    status_color = 0xFFFC7F
                 if 7 in chord:
-                    color = 0x000000
+                    status_color = 0x000000
 
-                if not color is None:
-                    # Adjust brightness
-                    color = int(color * (255 / configuration['status_brightness']))
-                    for pixel in range(PIANO_KEYS, ALL_LIGHTS):
-                        strip.setPixelColor(pixel, color)
+                draw_status(status_color)                
 
                 # 15 is the second C note from the left. Toggle brightness down.
                 if 15 in chord:
                     configuration['status_brightness'] -= 1
                     if configuration['status_brightness'] < 1:
                         configuration['status_brightness'] = 1
+                    draw_status(status_color)
                 # 16 is the second D note from the left. Toggle brightness up.
                 if 17 in chord:
                     configuration['status_brightness'] += 1
                     if configuration['status_brightness'] > 255:
                         configuration['status_brightness'] = 255
-            
+                    draw_status(status_color)
+
             #for i, pixel in enumerate(leds):
             #    r, g, b = (pixel)
             #    leds[i] = (int(r/1.2), int(g/1.2), int(b/1.2))
@@ -163,7 +179,7 @@ def main():
             # if too short
             time.sleep(0.01)
 
-            if configuration['mode'] == 'midi' or (midi_input is not None):
+            if midi_input is not None:
                 for message in midi_input.iter_pending():
                     print(message)
                     last_key_time = time.time()
