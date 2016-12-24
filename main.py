@@ -81,7 +81,6 @@ def main():
 
     animations = []
     leds = [(0, 0, 0)] * PIANO_KEYS
-    last_key_time = time.time()
 
     usb_device_name = detect_usb_midi()
     if usb_device_name:
@@ -97,7 +96,11 @@ def main():
     configuration['gamma_correction'] = True
     configuration['animation'] = 1
     configuration['demo_delay'] = 60
+    configuration['demo_done'] = 60 * 60
     configuration['status_brightness'] = 255
+
+    # Start in demo on startup
+    last_key_time = time.time() - configuration['demo_delay']
 
     strip.begin()
     strip.show()
@@ -109,9 +112,12 @@ def main():
 
         while True:
     
-            if time.time() - last_key_time > configuration['demo_delay']:
+            idle_time = time.time() - last_key_time
+            if idle_time > configuration['demo_done']:
+                configuration['mode'] = 'sleep'
+            elif idle_time > configuration['demo_delay']:  
                 configuration['mode'] = 'demo'
-            elif configuration['mode'] == 'demo':
+            elif configuration['mode'] != 'midi':
                 configuration['mode'] = 'midi'        
 
             # Apply an optional filter (default is to black out LEDs). For now, directly clear the buffer
