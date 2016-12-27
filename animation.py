@@ -1,4 +1,5 @@
 """ The various classes relating to animations """
+from __future__ import print_function
 
 from random import randint
 import time
@@ -7,7 +8,7 @@ milliseconds = lambda: int(round(time.time() * 1000))
 
 class Animation:
     """The base class for any animation"""
-    def __init__(self, leds):
+    def __init__(self):
         """ Animation base class initializer """
 
     def get_frame(self):
@@ -22,7 +23,7 @@ class FireAnimation(Animation):
     def __init__(self):
         """ Fire animation """
         self._lights = []
-    	self._r = 255
+        self._r = 255
         self._g = 255 - 40
         self._b = 40
         self._end = 0
@@ -43,7 +44,6 @@ class FireAnimation(Animation):
                 if b1 < 0:
                     b1 = 0
                 self._lights.append((r1, g1, b1))
-        
         return self._lights
 
     def is_complete(self):
@@ -52,11 +52,10 @@ class FireAnimation(Animation):
 class ChristmasKeyPressAnimation(Animation):
     """Simple animation that happens when you press a key. It is pressure sensitive."""
 
-    def __init__(self, leds, key_pressed, velocity):
+    def __init__(self, key_pressed, velocity):
         """Initializes a new ChristmasKeyPressAnimation instance"""
-        Animation.__init__(self, leds)
+        Animation.__init__(self)
         self.__key_pressed = key_pressed
-        self.__leds = leds
         self._count = 0
         self._velocity = velocity
         self._end = milliseconds() + 1000
@@ -66,7 +65,7 @@ class ChristmasKeyPressAnimation(Animation):
         """Return an array of integers representing the current state of the animation"""
         leds = [(0, 0, 0)] * 88
 
-        if self._color == 0: 
+        if self._color == 0:
             leds[self.__key_pressed] = (self._velocity, 0, 0)
         if self._color == 1:
             leds[self.__key_pressed] = (0, self._velocity, 0)
@@ -88,11 +87,10 @@ class ChristmasKeyPressAnimation(Animation):
 class PressureKeyPressAnimation(Animation):
     """Simple animation that happens when you press a key. It is pressure sensitive."""
 
-    def __init__(self, leds, key_pressed, velocity):
+    def __init__(self, key_pressed, velocity):
         """Initializes a new PressureKeyPressAnimation instance"""
-        Animation.__init__(self, leds)
+        Animation.__init__(self)
         self.__key_pressed = key_pressed
-        self.__leds = leds
         self._count = 0
         self._velocity = velocity
         self._end = milliseconds() + 1000
@@ -113,11 +111,10 @@ class PressureKeyPressAnimation(Animation):
 class KeyPressAnimation(Animation):
     """Simple animation that happens when you press a key"""
 
-    def __init__(self, leds, key_pressed):
+    def __init__(self, key_pressed):
         """Initializes a new KeyPressAnimation instance"""
-        Animation.__init__(self, leds)
+        Animation.__init__(self)
         self.__key_pressed = key_pressed
-        self.__leds = leds
         self._count = 60
 
     def get_frame(self):
@@ -134,11 +131,10 @@ class KeyPressAnimation(Animation):
 class RunLeftAnimation(Animation):
     """Simple animation that happens when you press a key"""
 
-    def __init__(self, leds, key_pressed):
+    def __init__(self, key_pressed):
         """Initializes a new KeyPressAnimation instance"""
-        Animation.__init__(self, leds)
+        Animation.__init__(self)
         self.__key_pressed = key_pressed
-        self.__leds = leds
         r = randint(0, 3)
         if r == 0:
             self.__color = (255, 0, 0)
