@@ -93,7 +93,7 @@ def main():
     print("Starting main loop...")
 
     configuration['mode'] = 'demo'
-    configuration['gamma_correction'] = True
+    configuration['gamma_correction'] = False
     configuration['animation'] = 1
     configuration['demo_delay'] = 60
     configuration['demo_done'] = 60 * 60
@@ -114,9 +114,13 @@ def main():
     
             idle_time = time.time() - last_key_time
             if idle_time > configuration['demo_done']:
-                configuration['mode'] = 'sleep'
-            elif idle_time > configuration['demo_delay']:  
-                configuration['mode'] = 'demo'
+                if configuration['mode'] != 'sleep':
+                    configuration['mode'] = 'sleep'
+                    status_color = 0x000000
+                    draw_status(status_color)
+            elif idle_time > configuration['demo_delay']:
+                if configuration['mode'] != 'demo':  
+                    configuration['mode'] = 'demo'
             elif configuration['mode'] != 'midi':
                 configuration['mode'] = 'midi'        
 
