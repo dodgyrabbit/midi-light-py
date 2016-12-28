@@ -83,30 +83,6 @@ class ChristmasKeyPressAnimation(Animation):
         """True if this animation is complete and can be removed"""
         return milliseconds() > self._end
 
-class PressureKeyPressAnimation(Animation):
-    """Simple animation that happens when you press a key. It is pressure sensitive."""
-
-    def __init__(self, key_pressed, velocity):
-        """Initializes a new PressureKeyPressAnimation instance"""
-        Animation.__init__(self)
-        self._key_pressed = key_pressed
-        self._count = 0
-        self._velocity = velocity
-        self._end = milliseconds() + 1000
-
-    def get_frame(self):
-        """Return an array of integers representing the current state of the animation"""
-        leds = [(0, 0, 0)] * 88
-        leds[self._key_pressed] = (self._velocity, self._velocity, self._velocity)
-        self._count += 1
-        if self._count % 3 == 0:
-            self._velocity = int(self._velocity * 0.7)
-        return leds
-
-    def is_complete(self):
-        """True if this animation is complete and can be removed"""
-        return milliseconds() > self._end
-
 class KeyPressAnimation(Animation):
     """Simple animation that happens when you press a key"""
 
@@ -125,6 +101,27 @@ class KeyPressAnimation(Animation):
     def is_complete(self):
         """True if this animation is complete and can be removed"""
         return milliseconds() > self._end
+
+class PressureKeyPressAnimation(KeyPressAnimation):
+    """Simple animation that happens when you press a key. It is pressure sensitive."""
+
+    def __init__(self, keys, key_pressed, velocity, duration=1000):
+        """Initializes a new PressureKeyPressAnimation instance"""
+        KeyPressAnimation.__init__(self, keys, key_pressed, duration)
+        self._count = 0
+        self._velocity = velocity
+
+    def get_frame(self):
+        """Return an array of integers representing the current state of the animation"""
+        self._leds[self._key_pressed] = (self._velocity, self._velocity, self._velocity)
+        self._count += 1
+        if self._count % 3 == 0:
+            self._velocity = int(self._velocity * 0.7)
+        return self._leds
+
+    #def is_complete(self):
+    #    """True if this animation is complete and can be removed"""
+    #    return milliseconds() > self._end
 
 class RunLeftAnimation(Animation):
     """Simple animation that happens when you press a key"""
