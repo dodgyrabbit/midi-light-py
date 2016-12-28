@@ -7,13 +7,21 @@ to the RPI and processed in real-time to create various mood effects. In this pr
 strip and blend in with the environment. The LEDs also project onto the wall for greater visual effect.
 
 # Installation
-Clone the repo locally on your Raspberry PI.
 
-`git clone https://github.com/dodgyrabbit/midi-light-py.git`
+Clone the repo locally on your Raspberry PI. This repository uses Git submodules.
+If the /lib folder is empty, use the commands below to update. Newer versions of Git automatically pulls them during initial clone.
+
+```
+git clone https://github.com/dodgyrabbit/midi-light-py.git
+git submodule init
+git submodule update
+```
 
 Ensure all the dependencies (noted below) are installed run
 
-`pip install -r requirements.txt`
+```
+pip install -r requirements.txt
+```
 
 To start:
 ```
@@ -64,17 +72,6 @@ If you get something like this
 you're golden. The **USB2.0-MIDI MIDI 1** is what you want to see (on a Linux Desktop.)
 On the RPI the string was similar to "MIDI 1".
 
-#Installation
-
-TODO Add proper install instructions here.
-
-This repository uses Git submodules. If the /lib folder is empty, use the commands below to update. Newer versions of Git automatically pulls them during initial clone.
-
-```
-git clone https://github.com/dodgyrabbit/midi-light-py
-git submodule init
-git submodule update
-```
 
 
 
