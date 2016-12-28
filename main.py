@@ -9,9 +9,9 @@ import time
 import animation
 import mido
 from random import randint
-from lib.dotstar import Adafruit_DotStar
+#from lib.dotstar import Adafruit_DotStar
 #from lib.Adafruit_DotStar_Pi.dotstar import Adafruit_DotStar
-#from lib.Mock_DotStar import Adafruit_DotStar
+from lib.Mock_DotStar import Adafruit_DotStar
 
 # How many keys there are on (your) piano/keyboard
 PIANO_KEYS = 88
@@ -204,8 +204,8 @@ def main():
                     # Here we would get a key press
                     key_pressed = randint(0, PIANO_KEYS-1)
 
-                    animations.append(animation.PressureKeyPressAnimation(key_pressed, randint(1, 192)))
-                    #animations.append(animation.KeyPressAnimation(key_pressed))
+                    animations.append(animation.PressureKeyPressAnimation(PIANO_KEYS, key_pressed, randint(1, 255), 1000))
+                    #animations.append(animation.KeyPressAnimation(PIANO_KEYS, key_pressed))
                     #animations.append(animation.RunLeftAnimation(key_pressed))
 
     except KeyboardInterrupt:

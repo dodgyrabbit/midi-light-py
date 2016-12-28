@@ -1,5 +1,6 @@
 """ The various classes relating to animations """
 from __future__ import print_function
+from __future__ import division 
 
 from random import randint
 import time
@@ -108,20 +109,20 @@ class PressureKeyPressAnimation(KeyPressAnimation):
     def __init__(self, keys, key_pressed, velocity, duration=1000):
         """Initializes a new PressureKeyPressAnimation instance"""
         KeyPressAnimation.__init__(self, keys, key_pressed, duration)
-        self._count = 0
         self._velocity = velocity
+        self._duration = duration
 
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
-        self._leds[self._key_pressed] = (self._velocity, self._velocity, self._velocity)
-        self._count += 1
-        if self._count % 3 == 0:
-            self._velocity = int(self._velocity * 0.7)
-        return self._leds
 
-    #def is_complete(self):
-    #    """True if this animation is complete and can be removed"""
-    #    return milliseconds() > self._end
+        time_left = self._end - milliseconds()
+        if time_left < 0:
+            time_left = 0
+
+        color = int((time_left / self._duration) * self._velocity)
+
+        self._leds[self._key_pressed] = (color, color, color)
+        return self._leds
 
 class RunLeftAnimation(Animation):
     """Simple animation that happens when you press a key"""
