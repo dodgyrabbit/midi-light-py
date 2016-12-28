@@ -25,7 +25,6 @@ pip install -r requirements.txt
 
 To start:
 ```
-cd midilightpy
 python main.py
 ```
 
