@@ -15,7 +15,7 @@ from random import randint
 try:
     from dotstar import Adafruit_DotStar_Pi
 except ImportError:
-    from lib.Mock_DotStar import Adafruit_DotStar
+    from Mock_DotStar import Adafruit_DotStar
 
 # How many keys there are on (your) piano/keyboard
 PIANO_KEYS = 88
