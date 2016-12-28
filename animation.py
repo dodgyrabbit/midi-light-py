@@ -109,18 +109,18 @@ class RunLeftAnimation(Animation):
         self._key_pressed = key_pressed
         r = randint(0, 3)
         if r == 0:
-            self.__color = (255, 0, 0)
+            self._color = (255, 0, 0)
         if r == 1:
-            self.__color = (255, 255, 255)
+            self._color = (255, 255, 255)
         if r == 2:
-            self.__color = (255, 255, 0)
+            self._color = (255, 255, 0)
         if r == 3:
-            self.__color = (0, 255, 255)
+            self._color = (0, 255, 255)
 
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
         leds = [(0, 0, 0)] * 88
-        leds[self._key_pressed] = self.__color
+        leds[self._key_pressed] = self._color
         self._key_pressed -= 1
         return leds
 
