@@ -11,7 +11,7 @@ import animation
 import mido
 from random import randint
 
-# Dynamically decide if we use the emulator or an actual DotStar. 
+# Dynamically decide if we use the emulator or an actual DotStar.
 try:
     from dotstar import Adafruit_DotStar_Pi
 except ImportError:

@@ -42,17 +42,12 @@ first LED on my strip would misbehave and I got strange results. It turns out th
 ### [mido](https://github.com/olemb/mido)
 A Python library that allows you to parse MIDI messages.
 
-`sudo pip install mido`
-
-### libportmidi-dev
-
-`sudo apt-get install libportmidi-dev`
+### [rtmidi-python](https://github.com/superquadratic/rtmidi-python)
 
 ### [graphics.py](http://mcsp.wartburg.edu/zelle/python/graphics.py)
-Grapics.py is only used so I can simulate what the LED strip looks like on Windows or Linux. This saves a bit of time because developing 
-directly on the RPI is a little more challenging (although I did a lot of that).
+Graphics.py is used to simulate the LED strip. This saves a bit of time because developing directly on the RPI is a little more challenging (although I did a lot of that).
 
-I had to install this dependency to get it to work
+Note: On Linux I had to install this dependency to get it to work
 
 `sudo apt-get install python-tk`
 
@@ -61,12 +56,13 @@ To verify if your USB device is working properly, run the following quick Python
 
 ```python
 import mido
-backend =  mido.Backend()
+backend = mido.Backend('mido.backends.rtmidi')
 print backend.get_input_names()
 ```
 If you get something like this
 `[u'Midi Through Port-0', u'USB2.0-MIDI MIDI 1']`
-you're golden. The **USB2.0-MIDI MIDI 1** is what you want to see.
+you're golden. The **USB2.0-MIDI MIDI 1** is what you want to see (on a Linux Desktop.)
+On the RPI the string was similar to "MIDI 1".
 
 #Installation
 
