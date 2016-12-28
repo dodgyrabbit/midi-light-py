@@ -9,9 +9,9 @@ import time
 import animation
 import mido
 from random import randint
-#from lib.dotstar import Adafruit_DotStar
+from lib.dotstar import Adafruit_DotStar
 #from lib.Adafruit_DotStar_Pi.dotstar import Adafruit_DotStar
-from lib.Mock_DotStar import Adafruit_DotStar
+#from lib.Mock_DotStar import Adafruit_DotStar
 
 # How many keys there are on (your) piano/keyboard
 PIANO_KEYS = 88
@@ -191,8 +191,8 @@ def main():
                     if message.type == 'note_on':
                         note = message.note - FIRST_MIDI_NOTE
                         chord.add(note)
-                        #animations.append(animation.PressureKeyPressAnimation(note, message.velocity * 2))
-                        animations.append(animation.ChristmasKeyPressAnimation(note, message.velocity * 2))
+                        animations.append(animation.PressureKeyPressAnimation(PIANO_KEYS,note, message.velocity * 2, 3000))
+                        #animations.append(animation.ChristmasKeyPressAnimation(note, message.velocity * 2))
                     if message.type == 'note_off':
                         note = message.note - FIRST_MIDI_NOTE
                         if note in chord:
