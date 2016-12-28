@@ -1,28 +1,29 @@
 # midi-light-py
-An LED strip controlled by a Raspberry PI and MIDI keyboard.
-The side motivation for this was to learn Python, as I've never done any Python projects.
+A wall mounted ambient light panel that responds to your MIDI based keyboard. It is a Raspberry PI based projected written in Python.
 
 # Overview
-Add some lighting effects to your music, by attaching an LED strip and Raspberry PI to your MIDI keyboard.
-The MIDI output is used as an input to the RPI and processed to create various effects. Place the
-LED strip behind your keyboard for a nice effect.
-
-The project was developed on Linux using [Visual Studio Code](http://code.visualstudio.com/) but pretty sure you can make it work on Windows or Mac.
+Add some visual effects to your tunes by attaching an LED strip and Raspberry PI to your MIDI keyboard. The MIDI output is used as an input 
+to the RPI and processed in real-time to create various mood effects. In this project I created a "floating" wooden panel to hide the LED
+strip and blend in with the environment. The LEDs also project onto the wall for greater visual effect.
 
 ## Hardware
-* [Raspberry Pi 3](https://www.raspberrypi.org/) - Older Pi will also work. I got this one so I can add a [Perma Proto HAT] (https://www.adafruit.com/products/2314)
-* [DotStar LED Strip 60 LED] (https://www.adafruit.com/products/2239) - 2M of this will be plently. A full size Piano is about 1.5 M with 88 keys. At 60 LEDs per M this gives you the correct density to have an LED per note on a full size Piano.
+* [Raspberry Pi](https://www.raspberrypi.org/) - I'm using on of the originals but newer PIs will work too. 
+* [DotStar LED Strip 60 LED] (https://www.adafruit.com/products/2239) - A full size Piano is about 1.5 M with 88 keys. At 60 LEDs per M this gives you about the correct density to have an LED per note on a full size Piano. I used the remaining LEDs to light up the bottom part of the light fixture.
 * [5V 10A switching power supply](https://www.adafruit.com/products/658) - Probably overkill but I want to be able to drive all LEDs (60mA each) at full strength as a nice backlight.
-* [3V-5V Level shifter](https://www.adafruit.com/products/1787) - The RPI GIO pins are 3.3V but the DotStar LED strip expects 5V. Use this level shifter to compensate.
 * [USB-MIDI interface] (http://www.ebay.com/itm/New-USB-IN-OUT-MIDI-Interface-Cable-Converter-to-PC-Music-Keyboard-Adapter-Cord-/361501225810) - This cheap interface seems to work just fine.
 
+Note that AdaFruit recommends a [level shifter](https://www.adafruit.com/products/1787) be used since the RPI GIO pins are 3.3V but the DotStar LED strip expects 5V. However, I found that with this level shifter the
+first LED on my strip would misbehave and I got strange results. It turns out that the DotStar worked perfectly fine without it.
+
 ## Wall mount
-* A wood light fixture that houses the RPI and LED lights.
-* The fixture appears to "float" mid air with LED strip lighting from the top.
-* Power (for RPI and LED strip) and MIDI cables connects to the fixture.
+* A wooden light fixture that houses the RPI and LED lights and attaches to the wall.
+* The fixture appears to float on the wall and the LED strip is at the top (the part that responds to notes) and a bottom light for status or reading your music.
 
 ## Software
-The software is written in Python. The following libraries are used:
+* The project was mostly developed on Linux using [Visual Studio Code](http://code.visualstudio.com/).
+* On the RPI itself I used nano.
+* The software is written in Python.
+
 ### [mido](https://github.com/olemb/mido)
 A Python library that allows you to parse MIDI messages.
 
@@ -33,6 +34,8 @@ A Python library that allows you to parse MIDI messages.
 `sudo apt-get install libportmidi-dev`
 
 ### [graphics.py](http://mcsp.wartburg.edu/zelle/python/graphics.py)
+Grapics.py is only used so I can simulate what the LED strip looks like on Windows or Linux. This saves a bit of time because developing 
+directly on the RPI is a little more challenging (although I did a lot of that).
 
 I had to install this dependency to get it to work
 
