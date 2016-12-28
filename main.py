@@ -7,11 +7,15 @@ from __future__ import division
 
 import time
 import animation
+
 import mido
 from random import randint
-from lib.dotstar import Adafruit_DotStar
-#from lib.Adafruit_DotStar_Pi.dotstar import Adafruit_DotStar
-#from lib.Mock_DotStar import Adafruit_DotStar
+
+# Dynamically decide if we use the emulator or an actual DotStar. 
+try:
+    from dotstar import Adafruit_DotStar_Pi
+except ImportError:
+    from lib.Mock_DotStar import Adafruit_DotStar
 
 # How many keys there are on (your) piano/keyboard
 PIANO_KEYS = 88
@@ -50,8 +54,15 @@ strip = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
 status_color = None
 
 def detect_usb_midi():
+
+    midi_devices = []
+    try:
+        midi_devices = mido.Backend('mido.backends.rtmidi').get_input_names()
+
+    except ImportError:
+        print("Could not load rtmidi. Try 'pip install python-rtmidi'")
+
     """Returns the first device with USB in the name. None otherwise."""
-    midi_devices = mido.Backend().get_input_names()
     first_usb_device = next((x for x in midi_devices if 'USB' in x), None)
 
     if first_usb_device is None:
@@ -213,6 +224,7 @@ def main():
         print("Exiting...")
         strip.clear()
         strip.show()
+        strip.close()
         if midi_input:
             midi_input.close()
 

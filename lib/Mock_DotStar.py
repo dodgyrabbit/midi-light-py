@@ -69,6 +69,11 @@ class Adafruit_DotStar:
         # Set strip data to 'off' (just clears buffer, does not write to strip)
         self._pixels = [0] * self._numPixels
 
+    def close(self):
+        """Closes the LED window. """
+        if not self._win.closed:
+            self._win.close()
+
     def show(self):
         """Renders the current state of the LEDs to screen."""
         for led, pixel in zip(self._leds, self._pixels):
