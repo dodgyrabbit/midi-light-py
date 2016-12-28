@@ -6,6 +6,21 @@ Add some visual effects to your tunes by attaching an LED strip and Raspberry PI
 to the RPI and processed in real-time to create various mood effects. In this project I created a "floating" wooden panel to hide the LED
 strip and blend in with the environment. The LEDs also project onto the wall for greater visual effect.
 
+# Installation
+Clone the repo locally on your Raspberry PI.
+
+`git clone https://github.com/dodgyrabbit/midi-light-py.git`
+
+Ensure all the dependencies (noted below) are installed run
+
+`pip install -r requirements.txt`
+
+To start:
+```
+cd midilightpy
+python main.py
+```
+
 ## Hardware
 * [Raspberry Pi](https://www.raspberrypi.org/) - I'm using on of the originals but newer PIs will work too. 
 * [DotStar LED Strip 60 LED] (https://www.adafruit.com/products/2239) - A full size Piano is about 1.5 M with 88 keys. At 60 LEDs per M this gives you about the correct density to have an LED per note on a full size Piano. I used the remaining LEDs to light up the bottom part of the light fixture.
