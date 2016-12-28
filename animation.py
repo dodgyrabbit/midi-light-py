@@ -6,10 +6,11 @@ import time
 
 milliseconds = lambda: int(round(time.time() * 1000))
 
-class Animation:
+class Animation(object):
     """The base class for any animation"""
     def __init__(self):
         """ Animation base class initializer """
+        object.__init__(self)
 
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
@@ -20,8 +21,9 @@ class Animation:
         return False
 
 class FireAnimation(Animation):
+    """ Fire animation """
     def __init__(self):
-        """ Fire animation """
+        Animation.__init__(self)
         self._lights = []
         self._r = 255
         self._g = 255 - 40
@@ -29,7 +31,7 @@ class FireAnimation(Animation):
         self._end = 0
 
     def get_frame(self):
-        if (milliseconds() > self._end):
+        if milliseconds() > self._end:
             self._end = milliseconds() + 50
             self._lights = []
             for i in range(0, 88):
@@ -55,7 +57,7 @@ class ChristmasKeyPressAnimation(Animation):
     def __init__(self, key_pressed, velocity):
         """Initializes a new ChristmasKeyPressAnimation instance"""
         Animation.__init__(self)
-        self.__key_pressed = key_pressed
+        self._key_pressed = key_pressed
         self._count = 0
         self._velocity = velocity
         self._end = milliseconds() + 1000
@@ -66,11 +68,11 @@ class ChristmasKeyPressAnimation(Animation):
         leds = [(0, 0, 0)] * 88
 
         if self._color == 0:
-            leds[self.__key_pressed] = (self._velocity, 0, 0)
+            leds[self._key_pressed] = (self._velocity, 0, 0)
         if self._color == 1:
-            leds[self.__key_pressed] = (0, self._velocity, 0)
+            leds[self._key_pressed] = (0, self._velocity, 0)
         if self._color == 2:
-            leds[self.__key_pressed] = (self._velocity, self._velocity, self._velocity)
+            leds[self._key_pressed] = (self._velocity, self._velocity, self._velocity)
 
         self._count += 1
         if self._count % 3 == 0:
@@ -81,16 +83,13 @@ class ChristmasKeyPressAnimation(Animation):
         """True if this animation is complete and can be removed"""
         return milliseconds() > self._end
 
-
-
-
 class PressureKeyPressAnimation(Animation):
     """Simple animation that happens when you press a key. It is pressure sensitive."""
 
     def __init__(self, key_pressed, velocity):
         """Initializes a new PressureKeyPressAnimation instance"""
         Animation.__init__(self)
-        self.__key_pressed = key_pressed
+        self._key_pressed = key_pressed
         self._count = 0
         self._velocity = velocity
         self._end = milliseconds() + 1000
@@ -98,7 +97,7 @@ class PressureKeyPressAnimation(Animation):
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
         leds = [(0, 0, 0)] * 88
-        leds[self.__key_pressed] = (self._velocity, self._velocity, self._velocity)
+        leds[self._key_pressed] = (self._velocity, self._velocity, self._velocity)
         self._count += 1
         if self._count % 3 == 0:
             self._velocity = int(self._velocity * 0.7)
@@ -111,22 +110,21 @@ class PressureKeyPressAnimation(Animation):
 class KeyPressAnimation(Animation):
     """Simple animation that happens when you press a key"""
 
-    def __init__(self, key_pressed):
+    def __init__(self, keys, key_pressed, duration=1000):
         """Initializes a new KeyPressAnimation instance"""
         Animation.__init__(self)
-        self.__key_pressed = key_pressed
-        self._count = 60
+        self._end = milliseconds() + duration
+        self._leds = [(0, 0, 0)] * keys
+        self._key_pressed = key_pressed
 
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
-        leds = [(0, 0, 0)] * 88
-        leds[self.__key_pressed] = (255, 255, 255)
-        self._count -= 1
-        return leds
+        self._leds[self._key_pressed] = (255, 255, 255)
+        return self._leds
 
     def is_complete(self):
         """True if this animation is complete and can be removed"""
-        return self._count < 0
+        return milliseconds() > self._end
 
 class RunLeftAnimation(Animation):
     """Simple animation that happens when you press a key"""
@@ -134,7 +132,7 @@ class RunLeftAnimation(Animation):
     def __init__(self, key_pressed):
         """Initializes a new KeyPressAnimation instance"""
         Animation.__init__(self)
-        self.__key_pressed = key_pressed
+        self._key_pressed = key_pressed
         r = randint(0, 3)
         if r == 0:
             self.__color = (255, 0, 0)
@@ -148,10 +146,10 @@ class RunLeftAnimation(Animation):
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
         leds = [(0, 0, 0)] * 88
-        leds[self.__key_pressed] = self.__color
-        self.__key_pressed -= 1
+        leds[self._key_pressed] = self.__color
+        self._key_pressed -= 1
         return leds
 
     def is_complete(self):
         """True if this animation is complete and can be removed"""
-        return self.__key_pressed < 0
+        return self._key_pressed < 0
