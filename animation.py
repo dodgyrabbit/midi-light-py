@@ -52,38 +52,6 @@ class FireAnimation(Animation):
     def is_complete(self):
         return False
 
-class ChristmasKeyPressAnimation(Animation):
-    """Simple animation that happens when you press a key. It is pressure sensitive."""
-
-    def __init__(self, key_pressed, velocity):
-        """Initializes a new ChristmasKeyPressAnimation instance"""
-        Animation.__init__(self)
-        self._key_pressed = key_pressed
-        self._count = 0
-        self._velocity = velocity
-        self._end = milliseconds() + 1000
-        self._color = randint(0, 2)
-
-    def get_frame(self):
-        """Return an array of integers representing the current state of the animation"""
-        leds = [(0, 0, 0)] * 88
-
-        if self._color == 0:
-            leds[self._key_pressed] = (self._velocity, 0, 0)
-        if self._color == 1:
-            leds[self._key_pressed] = (0, self._velocity, 0)
-        if self._color == 2:
-            leds[self._key_pressed] = (self._velocity, self._velocity, self._velocity)
-
-        self._count += 1
-        if self._count % 3 == 0:
-            self._velocity = int(self._velocity * 0.9)
-        return leds
-
-    def is_complete(self):
-        """True if this animation is complete and can be removed"""
-        return milliseconds() > self._end
-
 class KeyPressAnimation(Animation):
     """Simple animation that happens when you press a key"""
 
@@ -112,6 +80,10 @@ class PressureKeyPressAnimation(KeyPressAnimation):
         self._velocity = velocity
         self._duration = duration
 
+    def get_key_color(self):
+        """Returns the color of the key pressed during animation. Override to change. """
+        return (self._velocity, self._velocity, self._velocity)
+
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
 
@@ -119,9 +91,13 @@ class PressureKeyPressAnimation(KeyPressAnimation):
         if time_left < 0:
             time_left = 0
 
-        color = int((time_left / self._duration) * self._velocity)
+        r, g, b = self.get_key_color()
+        fade_factor = time_left / self._duration
+        r = int(r * fade_factor)
+        g = int(g * fade_factor)
+        b = int(b * fade_factor)
 
-        self._leds[self._key_pressed] = (color, color, color)
+        self._leds[self._key_pressed] = (r, g, b)
         return self._leds
 
 class RunLeftAnimation(Animation):
@@ -151,3 +127,22 @@ class RunLeftAnimation(Animation):
     def is_complete(self):
         """True if this animation is complete and can be removed"""
         return self._key_pressed < 0
+
+class ChristmasKeyPressAnimation(PressureKeyPressAnimation):
+    """Simple animation that happens when you press a key. It is pressure sensitive."""
+
+    def __init__(self, keys, key_pressed, velocity, duration=1000):
+        """Initializes a new ChristmasKeyPressAnimation instance"""
+        PressureKeyPressAnimation.__init__(self, keys, key_pressed, velocity, duration)
+        color = randint(0, 2)
+
+        if color == 0:
+            self._color = (velocity, 0, 0)
+        if color == 1:
+            self._color = (0, velocity, 0)
+        if color == 2:
+            self._color = (velocity, velocity, velocity)
+
+    def get_key_color(self):
+        """Overrides the default and return a Christmasey color"""
+        return self._color

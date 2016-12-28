@@ -204,7 +204,8 @@ def main():
                     # Here we would get a key press
                     key_pressed = randint(0, PIANO_KEYS-1)
 
-                    animations.append(animation.PressureKeyPressAnimation(PIANO_KEYS, key_pressed, randint(1, 255), 1000))
+                    animations.append(animation.ChristmasKeyPressAnimation(PIANO_KEYS, key_pressed, randint(1, 255), 1000))
+                    #animations.append(animation.PressureKeyPressAnimation(PIANO_KEYS, key_pressed, randint(1, 255), 1000))
                     #animations.append(animation.KeyPressAnimation(PIANO_KEYS, key_pressed))
                     #animations.append(animation.RunLeftAnimation(key_pressed))
 
