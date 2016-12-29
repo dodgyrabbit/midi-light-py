@@ -13,8 +13,9 @@ from random import randint
 
 # Dynamically decide if we use the emulator or an actual DotStar.
 try:
-    from dotstar import Adafruit_DotStar_Pi
+    from lib.dotstar import Adafruit_DotStar
 except ImportError:
+    print("Loading UI instead of Adafruit_DotStar_Pi")
     from Mock_DotStar import Adafruit_DotStar
 
 # How many keys there are on (your) piano/keyboard
@@ -57,7 +58,11 @@ def detect_usb_midi():
 
     midi_devices = []
     try:
-        midi_devices = mido.Backend('mido.backends.rtmidi').get_input_names()
+        # Override default (portmidi) to use rtmidi. Note that portmidi
+        # worked fine on RPI but rtmidi is faster and more portable in my experience
+        # rtmidi had to be built directly on the RPI though
+        mido.set_backend('mido.backends.rtmidi')
+        midi_devices = mido.get_input_names()
 
     except ImportError:
         print("Could not load rtmidi. Try 'pip install python-rtmidi'")
