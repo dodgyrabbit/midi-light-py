@@ -8,16 +8,27 @@ strip and blend in with the environment. The LEDs also project onto the wall for
 
 # Installation
 
-Clone the repo locally on your Raspberry PI. This repository uses Git submodules.
-If the /lib folder is empty, use the commands below to update. Newer versions of Git automatically pulls them during initial clone.
+Clone the repo locally on your Raspberry PI. This repository uses Git submodules (for the Adafruit library).
 
 ```
 git clone https://github.com/dodgyrabbit/midi-light-py.git
+```
+
+If the /lib folder is empty, use the commands below to update. Newer versions of Git automatically pulls them during initial clone, so this step won't be needed.
+```
 git submodule init
 git submodule update
 ```
 
-Ensure all the dependencies (noted below) are installed run
+The only tricky part is to install [python-rtmidi](https://spotlightkid.github.io/python-rtmidi/index.html)
+You will need to build it on Linux (and your RPI). In order to build, it needs various header files.
+On my Ubuntu and Raspbian the following commands installed all the prerequisites.
+
+```
+sudo apt-get install build-essential python-dev libasound2-dev libjack-jackd2-dev
+```
+
+Now install Python packages and build python-rtmidi:
 
 ```
 pip install -r requirements.txt
@@ -28,8 +39,18 @@ To start:
 python main.py
 ```
 
+Note: If you want to run this on your desktop computer (not on the PI), install python-tk (TkInter). This is required by the graphics.py library and I 
+created a small simulator that shows the LED states.
+```
+sudo apt-get install python-tk
+```
+Each numbered block represents an LED on your DotStar LED strip. The color of the block is black (for off) or the corresponding RGB color when it's lit.
+![simulator](simulator.png)
+
+
+
 ## Hardware
-* [Raspberry Pi](https://www.raspberrypi.org/) - I'm using on of the originals but newer PIs will work too. 
+* [Raspberry Pi](https://www.raspberrypi.org/) - I'm using a RPI 1 but newer PIs will work too. 
 * [DotStar LED Strip 60 LED] (https://www.adafruit.com/products/2239) - A full size Piano is about 1.5 M with 88 keys. At 60 LEDs per M this gives you about the correct density to have an LED per note on a full size Piano. I used the remaining LEDs to light up the bottom part of the light fixture.
 * [5V 10A switching power supply](https://www.adafruit.com/products/658) - Probably overkill but I want to be able to drive all LEDs (60mA each) at full strength as a nice backlight.
 * [USB-MIDI interface] (http://www.ebay.com/itm/New-USB-IN-OUT-MIDI-Interface-Cable-Converter-to-PC-Music-Keyboard-Adapter-Cord-/361501225810) - This cheap interface seems to work just fine.
@@ -41,22 +62,21 @@ first LED on my strip would misbehave and I got strange results. It turns out th
 * A wooden light fixture that houses the RPI and LED lights and attaches to the wall.
 * The fixture appears to float on the wall and the LED strip is at the top (the part that responds to notes) and a bottom light for status or reading your music.
 
-## Software
+## Software Dependencies
+|Package|Description|
+|-------|-----------|
+| [mido](https://github.com/olemb/mido) | A Python library that allows you to parse and work with MIDI messages. mido = Midi Objects. |
+| [rtmidi-python](https://github.com/superquadratic/rtmidi-python) | mido uses **Backend**s, which are just wrappers around a particular midi drivers. I used the rtmidi Backend (as recommended) so you need to get rtmidi-python installed. This was the only real tricky part as it needs to be compiled and you need all the dependencies for that to work installed as per the instructions above. |
+| [graphics.py](http://mcsp.wartburg.edu/zelle/python/graphics.py) | Graphics.py is used to simulate the LED strip. This saves a bit of time because developing directly on the RPI is a little more challenging (although I did a lot of that). |
+
+## About
 * The project was mostly developed on Linux using [Visual Studio Code](http://code.visualstudio.com/).
-* On the RPI itself I used nano.
 * The software is written in Python.
-
-### [mido](https://github.com/olemb/mido)
-A Python library that allows you to parse MIDI messages.
-
-### [rtmidi-python](https://github.com/superquadratic/rtmidi-python)
-
-### [graphics.py](http://mcsp.wartburg.edu/zelle/python/graphics.py)
-Graphics.py is used to simulate the LED strip. This saves a bit of time because developing directly on the RPI is a little more challenging (although I did a lot of that).
-
-Note: On Linux I had to install this dependency to get it to work
-
-`sudo apt-get install python-tk`
+* On the RPI itself I used nano. It supports syntax hilighting and I can easily SSH in and start making changes. However, in your home directory, create a `.nanorc` file and add these two lines to it:
+```
+set tabsize 4
+set tabstospaces
+``` 
 
 ### Quick test
 To verify if your USB device is working properly, run the following quick Python test
