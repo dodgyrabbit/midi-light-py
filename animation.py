@@ -1,17 +1,19 @@
 """ The various classes relating to animations """
 from __future__ import print_function
-from __future__ import division 
+from __future__ import division
 
 from random import randint
 import time
 
-milliseconds = lambda: int(round(time.time() * 1000))
-
 class Animation(object):
     """The base class for any animation"""
-    def __init__(self):
+    def __init__(self, milliseconds=None):
         """ Animation base class initializer """
         object.__init__(self)
+        if milliseconds is None:
+            self._milliseconds = lambda: int(round(time.time() * 1000))
+        else:
+            self._milliseconds = milliseconds
 
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
@@ -32,8 +34,8 @@ class FireAnimation(Animation):
         self._end = 0
 
     def get_frame(self):
-        if milliseconds() > self._end:
-            self._end = milliseconds() + 50
+        if self._milliseconds() > self._end:
+            self._end = self._milliseconds() + 50
             self._lights = []
             for i in range(0, 88):
                 flicker = randint(0, 150)
@@ -55,10 +57,10 @@ class FireAnimation(Animation):
 class KeyPressAnimation(Animation):
     """Simple animation that happens when you press a key"""
 
-    def __init__(self, keys, key_pressed, duration=1000):
+    def __init__(self, keys, key_pressed, duration=1000, milliseconds=None):
         """Initializes a new KeyPressAnimation instance"""
         Animation.__init__(self)
-        self._end = milliseconds() + duration
+        self._end = self._milliseconds() + duration
         self._leds = [(0, 0, 0)] * keys
         self._key_pressed = key_pressed
 
@@ -69,7 +71,7 @@ class KeyPressAnimation(Animation):
 
     def is_complete(self):
         """True if this animation is complete and can be removed"""
-        return milliseconds() > self._end
+        return self._milliseconds() > self._end
 
 class PressureKeyPressAnimation(KeyPressAnimation):
     """Simple animation that happens when you press a key. It is pressure sensitive."""
@@ -87,7 +89,7 @@ class PressureKeyPressAnimation(KeyPressAnimation):
     def get_frame(self):
         """Return an array of integers representing the current state of the animation"""
 
-        time_left = self._end - milliseconds()
+        time_left = self._end - self._milliseconds()
         if time_left < 0:
             time_left = 0
 
