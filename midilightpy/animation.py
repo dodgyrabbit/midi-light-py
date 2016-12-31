@@ -157,7 +157,6 @@ class RunningAnimation(Animation):
         self._animations = []
         self._keys = keys
         self._key = 0
-        self._leds = [(0, 0, 0)] * keys
 
     def key_pressed(self, velocity):
         """Call whenever a key is pressed"""
@@ -166,17 +165,18 @@ class RunningAnimation(Animation):
         self._key = self._key % self._keys
 
     def get_frame(self):
+        leds = [(0, 0, 0)] * self._keys
         for current_animation in self._animations:
             new_frame = current_animation.get_frame()
             for i, frame_pixel in enumerate(new_frame):
                 r, g, b = (frame_pixel)
                 if r > 0 or g > 0 or b > 0:
-                    self._leds[i] = frame_pixel
+                    leds[i] = frame_pixel
 
         # Remove keys that are complete
         self._animations = [x for x in self._animations if not x.is_complete()]
 
-        return self._leds
+        return leds
 
     def is_complete(self):
         return False
