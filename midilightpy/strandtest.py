@@ -8,10 +8,7 @@
 # USB.  DON'T try that with other code!
 
 import time
-from lib.Mock_DotStar import Adafruit_DotStar
-
-import colorsys
-
+from Mock_DotStar import Adafruit_DotStar
 
 numpixels = 30 # Number of LEDs in strip
 

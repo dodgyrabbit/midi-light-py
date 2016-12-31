@@ -1,6 +1,6 @@
 """Animation unit tests module"""
 import unittest
-import animation
+from  midilightpy import animation
 
 class AnimationTest(unittest.TestCase):
     """Verify all the animations working"""

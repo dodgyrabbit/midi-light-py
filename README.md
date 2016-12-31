@@ -36,7 +36,7 @@ pip install -r requirements.txt
 
 To start:
 ```
-python main.py
+python midilightpy/main.py
 ```
 
 Note: If you want to run this on your desktop computer (not on the PI), install python-tk (TkInter). This is required by the graphics.py library and I 
