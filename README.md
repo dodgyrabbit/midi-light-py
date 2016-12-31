@@ -45,7 +45,7 @@ created a small simulator that shows the LED states.
 sudo apt-get install python-tk
 ```
 Each numbered block represents an LED on your DotStar LED strip. The color of the block is black (for off) or the corresponding RGB color when it's lit.
-![simulator](simulator.png)
+![simulator](simulator.gif)
 
 
 
