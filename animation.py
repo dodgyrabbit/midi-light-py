@@ -162,7 +162,7 @@ class RunningAnimation(Animation):
     def key_pressed(self, velocity):
         """Call whenever a key is pressed"""
         self._animations.append(PressureKeyPressAnimation(self._keys, self._key, velocity, 1000, self._milliseconds))
-        self._key = self._key = 1
+        self._key = self._key + 1
         self._key = self._key % self._keys
 
     def get_frame(self):
