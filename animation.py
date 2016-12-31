@@ -76,9 +76,9 @@ class KeyPressAnimation(Animation):
 class PressureKeyPressAnimation(KeyPressAnimation):
     """Simple animation that happens when you press a key. It is pressure sensitive."""
 
-    def __init__(self, keys, key_pressed, velocity, duration=1000):
+    def __init__(self, keys, key_pressed, velocity, duration=1000, milliseconds=None):
         """Initializes a new PressureKeyPressAnimation instance"""
-        KeyPressAnimation.__init__(self, keys, key_pressed, duration)
+        KeyPressAnimation.__init__(self, keys, key_pressed, duration, milliseconds)
         self._velocity = velocity
         self._duration = duration
 
@@ -148,3 +148,35 @@ class ChristmasKeyPressAnimation(PressureKeyPressAnimation):
     def get_key_color(self):
         """Overrides the default and return a Christmasey color"""
         return self._color
+
+class RunningAnimation(Animation):
+    """Animation the moves each time a key is pressed"""
+    def __init__(self, keys, milliseconds=None):
+        Animation.__init__(self, milliseconds)
+        # This will hold the active key animations
+        self._animations = []
+        self._keys = keys
+        self._key = 0
+        self._leds = [(0, 0, 0)] * keys
+
+    def key_pressed(self, velocity):
+        """Call whenever a key is pressed"""
+        self._animations.append(PressureKeyPressAnimation(self._keys, self._key, velocity, 1000, self._milliseconds))
+        self._key = self._key = 1
+        self._key = self._key % self._keys
+
+    def get_frame(self):
+        for current_animation in self._animations:
+            new_frame = current_animation.get_frame()
+            for i, frame_pixel in enumerate(new_frame):
+                r, g, b = (frame_pixel)
+                if r > 0 or g > 0 or b > 0:
+                    self._leds[i] = frame_pixel
+
+        # Remove keys that are complete
+        self._animations = [x for x in self._animations if not x.is_complete()]
+
+        return self._leds
+
+    def is_complete(self):
+        return False

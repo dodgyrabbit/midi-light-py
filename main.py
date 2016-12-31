@@ -124,6 +124,9 @@ def main():
     # Used to detect the "secret chord" for controlling various aspects
     chord = set()
 
+    running_animation = animation.RunningAnimation(PIANO_KEYS)
+    animations.append(running_animation)
+
     try:
 
         while True:
@@ -207,7 +210,8 @@ def main():
                     if message.type == 'note_on':
                         note = message.note - FIRST_MIDI_NOTE
                         chord.add(note)
-                        animations.append(animation.PressureKeyPressAnimation(PIANO_KEYS,note, message.velocity * 2, 3000))
+                        running_animation.key_pressed(message.velocity * 2)
+                        #animations.append(animation.PressureKeyPressAnimation(PIANO_KEYS,note, message.velocity * 2, 3000))
                         #animations.append(animation.ChristmasKeyPressAnimation(note, message.velocity * 2))
                     if message.type == 'note_off':
                         note = message.note - FIRST_MIDI_NOTE

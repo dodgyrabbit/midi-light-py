@@ -23,3 +23,17 @@ class AnimationTest(unittest.TestCase):
         self.assertFalse(result.is_complete(), "Expected that animation is not over yet")
         current_milliseconds = current_milliseconds+1
         self.assertFalse(result.is_complete(), "Expected that animation is over")
+
+    def test_running_key_press(self):
+        """Test that pressing a key creates new animations"""
+        current_milliseconds = 0
+        anim = animation.RunningAnimation(10, lambda: current_milliseconds)
+        # No key pressed yet - so no animation on frame 1
+        self.assertEqual(anim.get_frame()[0], (0, 0, 0))
+        anim.key_pressed(1)
+        self.assertNotEqual(anim.get_frame()[0], (0, 0, 0))
+        self.assertEqual(anim.get_frame()[1], (0, 0, 0))
+        anim.key_pressed(1)
+        self.assertNotEqual(anim.get_frame()[0], (0, 0, 0))
+        self.assertNotEqual(anim.get_frame()[1], (0, 0, 0))
+        self.assertEqual(anim.get_frame()[2], (0, 0, 0))
