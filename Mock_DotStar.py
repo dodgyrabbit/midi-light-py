@@ -2,11 +2,11 @@
 A drop in replacment for the Adafruit_DotStar module.
 It allows me to to visualize what the LED strip may look like, without actually having one.
 """
+from __future__ import print_function
 
-#from lib.graphics import GraphWin, Circle, Point, color_rgb, Rectangle, Text
 import graphics
 
-class Adafruit_DotStar:
+class Adafruit_DotStar(object):
     "A mock implementation of the Adafruit_DotStart that simulates LEDs in the UI"
 
     _LED_SIZE = 30
@@ -27,9 +27,9 @@ class Adafruit_DotStar:
 
     def begin(self):
         """Opens the Mock_DotStar window."""
-        print( "Starting Mock_DotStar")
+        print("Starting Mock_DotStar")
 
-        self._win = graphics.GraphWin("PianoPy", self._WINDOW_WIDTH, self._WINDOW_HEIGHT)
+        self._win = graphics.GraphWin("midi-light-py", self._WINDOW_WIDTH, self._WINDOW_HEIGHT)
         self._win.setBackground("black")
         leds_per_row = self._WINDOW_WIDTH // (self._LED_SIZE)
         x = 0
@@ -56,7 +56,7 @@ class Adafruit_DotStar:
         """Sets the brightness for the whole strip. Not implemented."""
         print("setBrightness called in Mock_DotStar. Not implemented.")
 
-    def setPixelColor(self, index, color_or_r, g = None, b = None):
+    def setPixelColor(self, index, color_or_r, g=None, b=None):
         """Sets the given LED color value. To be compatible with DotStart library, you can either pass just the color value or r,g,b values."""
         if g is None:
             self._pixels[index] = color_or_r
