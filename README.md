@@ -21,12 +21,17 @@ git submodule update
 ```
 
 The only tricky part is to install [python-rtmidi](https://spotlightkid.github.io/python-rtmidi/index.html)
+
+## Linux
 You will need to build it on Linux (and your RPI). In order to build, it needs various header files.
 On my Ubuntu and Raspbian the following commands installed all the prerequisites.
 
 ```
 sudo apt-get install build-essential python-dev libasound2-dev libjack-jackd2-dev
 ```
+
+## Windows
+You need the Visual C++ build tools on Windows. You should be able to find it [here](http://landinghub.visualstudio.com/visual-cpp-build-tools) or just install Visual Studio Express.
 
 Now install Python packages and build python-rtmidi:
 
@@ -46,8 +51,6 @@ sudo apt-get install python-tk
 ```
 Each numbered block represents an LED on your DotStar LED strip. The color of the block is black (for off) or the corresponding RGB color when it's lit.
 ![simulator](simulator.gif)
-
-
 
 ## Hardware
 * [Raspberry Pi](https://www.raspberrypi.org/) - I'm using a RPI 1 but newer PIs will work too. 
