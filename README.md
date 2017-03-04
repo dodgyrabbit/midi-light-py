@@ -126,7 +126,25 @@ Edit the `/etc/rc.local` file and add the following line
 
 This should start up the Python program whenever the RPI restarts
 
+# Running unit tests
 
+From the root directory, run
+` python -m unittest discover -v`
+You should see something like this
+
+```
+test_keypress_is_complete (tests.test_animation.AnimationTest)
+Test that an animation with two LEDs has one on and one off ... ok
+test_keypress_one_key (tests.test_animation.AnimationTest)
+Test that an animation with one key returns a LED that is on ... ok
+test_keypress_two_keys (tests.test_animation.AnimationTest)
+Test that an animation with two LEDs has one on and one off ... ok
+test_running_key_press (tests.test_animation.AnimationTest)
+Test that pressing a key creates new animations ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.005s
+````
 
 
 
