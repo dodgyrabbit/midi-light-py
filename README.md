@@ -91,6 +91,25 @@ If you get something like this
 you're golden. The **USB2.0-MIDI MIDI 1** is what you want to see (on a Linux Desktop.)
 On the RPI the string was similar to "MIDI 1".
 
+### Running on RPI
+
+SSH into the RPI and run `nohup python main.py &`
+This should start your python program in the background and return to the console. You can disconnect your SSH.
+
+Once it's running, you may want to login later, stop the program and update the code etc.
+`ps -ax | grep pyth`
+This should show the the process running Python. Identify the process by name and then terminate it:
+`kill <processid>`
+
+### Setting it up to auto start
+
+Edit the `/etc/rc.local` file and add the following line
+
+`python home/pi/midi-light-py/main.py &`
+
+This should start up the Python program whenever the RPI restarts
+
+
 
 
 
