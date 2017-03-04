@@ -11,9 +11,14 @@ import animation
 import mido
 from random import randint
 
+#import sys
+#print(sys.path)
+
 # Dynamically decide if we use the emulator or an actual DotStar.
 try:
     from lib.dotstar import Adafruit_DotStar
+    # On RPI use this line instead
+    # from dotstar import Adafruit_DotStar
 except ImportError:
     print("Loading UI instead of Adafruit_DotStar_Pi")
     from Mock_DotStar import Adafruit_DotStar
@@ -136,6 +141,8 @@ def main():
                 if configuration['mode'] != 'sleep':
                     configuration['mode'] = 'sleep'
                     status_color = 0x000000
+                    strip.clear()
+                    strip.show()
                     draw_status(status_color)
             elif idle_time > configuration['demo_delay']:
                 if configuration['mode'] != 'demo':  
