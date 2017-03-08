@@ -147,9 +147,9 @@ def main():
                 if configuration['mode'] != 'sleep':
                     configuration['mode'] = 'sleep'
                     status_color = 0x000000
+                    draw_status(status_color)
                     STRIP.clear()
                     STRIP.show()
-                    draw_status(status_color)
             elif idle_time > configuration['demo_delay']:
                 if configuration['mode'] != 'demo':
                     configuration['mode'] = 'demo'
