@@ -122,7 +122,7 @@ This should show the the process running Python. Identify the process by name an
 
 Edit the `/etc/rc.local` file and add the following line
 
-`python home/pi/midi-light-py/main.py &`
+`python home/pi/midi-light-py/midilightpy/main.py &`
 
 This should start up the Python program whenever the RPI restarts
 
