@@ -44,13 +44,26 @@ To start:
 python midilightpy/main.py
 ```
 
-Note: If you want to run this on your desktop computer (not on the PI), install python-tk (TkInter). This is required by the graphics.py library and I 
-created a small simulator that shows the LED states.
+## Developing on Linux
+
+To develop and test this on your desktop Linux, you'll need to install two more software packages:
+
+### python-tk (TKinter)
+This is required by the graphics.py library and I created a small simulator that shows the LED states as blocks on screen.
 ```
 sudo apt-get install python-tk
 ```
 Each numbered block represents an LED on your DotStar LED strip. The color of the block is black (for off) or the corresponding RGB color when it's lit.
 ![simulator](simulator.gif)
+
+### vmpk (Virtual Midi Piano Keyboard)
+
+VMPK makes it possible to generate MIDI input without having to attach a real MIDI device to your machine. This makes it really convenient to test out new visualizations or features before deploying it to your RPI.
+
+```
+sudo apt-get install vmpk
+```
+![vmpk](vmpk.png)
 
 ## Hardware
 * [Raspberry Pi](https://www.raspberrypi.org/) - I'm using a RPI 1 but newer PIs will work too. 
@@ -71,6 +84,7 @@ first LED on my strip would misbehave and I got strange results. It turns out th
 | [mido](https://github.com/olemb/mido) | A Python library that allows you to parse and work with MIDI messages. mido = Midi Objects. |
 | [rtmidi-python](https://github.com/superquadratic/rtmidi-python) | mido uses **Backend**s, which are just wrappers around a particular midi drivers. I used the rtmidi Backend (as recommended) so you need to get rtmidi-python installed. This was the only real tricky part as it needs to be compiled and you need all the dependencies for that to work installed as per the instructions above. |
 | [graphics.py](http://mcsp.wartburg.edu/zelle/python/graphics.py) | Graphics.py is used to simulate the LED strip. This saves a bit of time because developing directly on the RPI is a little more challenging (although I did a lot of that). |
+| [vmpk](http://vmpk.sourceforge.net/) | Virtual Midi Piano Keyboard. Graphical keyboard used to simulate Midi device. |
 
 ## About
 * The project was mostly developed on Linux using [Visual Studio Code](http://code.visualstudio.com/).
