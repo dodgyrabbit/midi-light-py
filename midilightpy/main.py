@@ -79,6 +79,10 @@ def detect_usb_midi():
         print("Trying name 'MIDI 1'")
         first_usb_device = next((x for x in midi_devices if 'MIDI 1' in x), None)
 
+    if first_usb_device is None:
+        print("Trying name VMPK")
+        first_usb_device = next((x for x in midi_devices if 'VMPK' in x), None)
+
     return first_usb_device
 
 def color_blend(a, b):
