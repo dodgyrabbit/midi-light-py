@@ -6,7 +6,9 @@ from random import randint
 import time
 
 class Animation(object):
-    """The base class for any animation"""
+    """The base class for any animation. An animation is a state machine that produces frames.
+       Keep calling get_frame until is_complete returns true.
+    """
     def __init__(self, milliseconds=None):
         """ Animation base class initializer """
         object.__init__(self)
@@ -16,7 +18,7 @@ class Animation(object):
             self._milliseconds = milliseconds
 
     def get_frame(self):
-        """Return an array of integers representing the current state of the animation"""
+        """Return an array of tuples (r,g,b) i.e. the frame for the current state of the animation"""
         raise RuntimeError("GetFrame should only be called in derived classes")
 
     def is_complete(self):
@@ -54,11 +56,11 @@ class FireAnimation(Animation):
     def is_complete(self):
         return False
 
-class KeyPressAnimation(Animation):
-    """Simple animation that happens when you press a key"""
+class LightUpAnimation(Animation):
+    """Simple animation that lights up the given key for a short period of time"""
 
     def __init__(self, keys, key_pressed, duration=1000, milliseconds=None):
-        """Initializes a new KeyPressAnimation instance"""
+        """Initializes a new LightUpAnimation instance"""
         Animation.__init__(self)
         self._end = self._milliseconds() + duration
         self._leds = [(0, 0, 0)] * keys
@@ -73,21 +75,21 @@ class KeyPressAnimation(Animation):
         """True if this animation is complete and can be removed"""
         return self._milliseconds() > self._end
 
-class PressureKeyPressAnimation(KeyPressAnimation):
+class PressureKeyPressAnimation(LightUpAnimation):
     """Simple animation that happens when you press a key. It is pressure sensitive."""
 
     def __init__(self, keys, key_pressed, velocity, duration=1000, milliseconds=None):
         """Initializes a new PressureKeyPressAnimation instance"""
-        KeyPressAnimation.__init__(self, keys, key_pressed, duration, milliseconds)
+        LightUpAnimation.__init__(self, keys, key_pressed, duration, milliseconds)
         self._velocity = velocity
         self._duration = duration
 
     def get_key_color(self):
-        """Returns the color of the key pressed during animation. Override to change. """
+        """Returns the color of the key pressed during animation. Override to change."""
         return (self._velocity, self._velocity, self._velocity)
 
     def get_frame(self):
-        """Return an array of integers representing the current state of the animation"""
+        """Return an array of integers representing the current state of the animation."""
 
         time_left = self._end - self._milliseconds()
         if time_left < 0:
