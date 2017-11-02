@@ -6,10 +6,10 @@ from __future__ import print_function
 from __future__ import division
 
 import time
+from random import randint
 import animation
 
 import mido
-from random import randint
 
 #import sys
 #print(sys.path)
@@ -56,9 +56,7 @@ GAMMA = [ \
 # TODO: Need to refactor this main module into it's own class
 configuration = {}
 # This overload uses SPI
-strip = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
-
-status_color = None
+STRIP = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
 
 def detect_midi_device():
     """Returns the a MIDI device name. Looks for devices starting with 'USB', 'MIDI 1' or 'VMPK'.
@@ -87,11 +85,14 @@ def detect_midi_device():
 
     return first_usb_device
 
-def color_blend(a, b):
+def color_blend(color_a, color_b):
     """Performs a Screen blend on RGB color tuples, a and b"""
-    return (255 - (((255 - a[0]) * (255 - b[0])) >> 8), 255 - (((255 - a[1]) * (255 - b[1])) >> 8), 255 - (((255 - a[2]) * (255 - b[2])) >> 8))
+    return (255 - (((255 - color_a[0]) * (255 - color_b[0])) >> 8), \
+            255 - (((255 - color_a[1]) * (255 - color_b[1])) >> 8), \
+            255 - (((255 - color_a[2]) * (255 - color_b[2])) >> 8))
 
 def draw_status(color):
+    """Draws the status lights underneath the light bar"""
     if not color is None:
         # Adjust brightness
         r, g, b = ((color >> 16) & 255, (color >> 8) & 255, color & 255)
@@ -100,11 +101,11 @@ def draw_status(color):
         g = int(g * (configuration['status_brightness'] / 255))
         color = b + (g << 8) + (r << 16)
         for pixel in range(PIANO_KEYS, ALL_LIGHTS):
-            strip.setPixelColor(pixel, color)
+            STRIP.setPixelColor(pixel, color)
 
 def main():
     """ The main loop """
-    global status_color
+    status_color = None
 
     animations = []
     leds = [(0, 0, 0)] * PIANO_KEYS
@@ -129,8 +130,8 @@ def main():
     # Start in demo on startup
     last_key_time = time.time() - configuration['demo_delay']
 
-    strip.begin()
-    strip.show()
+    STRIP.begin()
+    STRIP.show()
 
     # Used to detect the "secret chord" for controlling various aspects
     chord = set()
@@ -146,8 +147,8 @@ def main():
                 if configuration['mode'] != 'sleep':
                     configuration['mode'] = 'sleep'
                     status_color = 0x000000
-                    strip.clear()
-                    strip.show()
+                    STRIP.clear()
+                    STRIP.show()
                     draw_status(status_color)
             elif idle_time > configuration['demo_delay']:
                 if configuration['mode'] != 'demo':
@@ -195,7 +196,6 @@ def main():
             #    r, g, b = (pixel)
             #    leds[i] = (int(r/1.2), int(g/1.2), int(b/1.2))
 
-
             for current_animation in animations:
                 new_frame = current_animation.get_frame()
                 for i, frame_pixel in enumerate(new_frame):
@@ -211,9 +211,9 @@ def main():
                     r = GAMMA[r]
                     g = GAMMA[g]
                     b = GAMMA[b]
-                strip.setPixelColor(i, r, g, b)
+                STRIP.setPixelColor(i, r, g, b)
 
-            strip.show()
+            STRIP.show()
 
             # Experiment to see how long we need to sleep - it seems that this may cause problems
             # if too short
@@ -249,9 +249,9 @@ def main():
 
     except KeyboardInterrupt:
         print("Exiting...")
-        strip.clear()
-        strip.show()
-        strip.close()
+        STRIP.clear()
+        STRIP.show()
+        STRIP.close()
         if midi_input:
             midi_input.close()
 
