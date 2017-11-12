@@ -65,17 +65,23 @@ class BeatAnimation(Animation):
         self._ms_per_beat = 1000 / (bpm / 60) 
         self._current_pulse_time = self._milliseconds()
         self._width = width
+        self._bell_curve = BeatAnimation.create_bell_curve(width)
+
+    @classmethod
+    def create_bell_curve(cls, width):
+        """ Create a bell curve with width elements and values between 0 and 1.
+            The standard deviation value of 0.4 means the curve will peak at 1.
+            Starting at around -1.5 to 1.5 gives a nice ramp up and down."""
 
         # Need to step between -1.5 and 1.5
-        step = 3.0 / width
-        x = -1.5
-        self._bell_curve = [0.0] * width
+        step = 2.0 / width
+        x = -1
+        curve = []
 
-        for i, _ in enumerate(self._bell_curve):
-            self._bell_curve[i] = self.normpdf(x, 0, 0.4)
+        for _ in range(width):
+            curve.append(cls.normpdf(x, 0, 0.4))
             x += step
-
-        print ("Beat interval {0} ".format(self._ms_per_beat))
+        return curve
     
     def get_frame(self):
         now = self._milliseconds()
@@ -94,8 +100,8 @@ class BeatAnimation(Animation):
     def is_complete(self):
         return False
 
-    @staticmethod
-    def normpdf(x, mean, standard_deviation):
+    @classmethod
+    def normpdf(cls, x, mean, standard_deviation):
         """ Calculates the normal distribution using a probability density function
             Found it here https://stackoverflow.com/a/12413491 """
         var = float(standard_deviation)**2
