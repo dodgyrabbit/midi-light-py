@@ -72,9 +72,7 @@ class BeatAnimation(Animation):
         self._bell_curve = [0.0] * width
 
         for i, _ in enumerate(self._bell_curve):
-            self._bell_curve[i] = normpdf(x, 0, 0.4)
-            print(self._bell_curve[i])
-            print(x)
+            self._bell_curve[i] = self.normpdf(x, 0, 0.4)
             x += step
 
         print ("Beat interval {0} ".format(self._ms_per_beat))
@@ -96,14 +94,15 @@ class BeatAnimation(Animation):
     def is_complete(self):
         return False
 
-def normpdf(x, mean, standard_deviation):
-    """ Calculates the normal distribution using a probability density function
-        Found it here https://stackoverflow.com/a/12413491 """
-    var = float(standard_deviation)**2
-    pi = 3.1415926
-    denom = (2*pi*var)**.5
-    num = math.exp(-(float(x)-float(mean))**2/(2*var))
-    return num/denom
+    @staticmethod
+    def normpdf(x, mean, standard_deviation):
+        """ Calculates the normal distribution using a probability density function
+            Found it here https://stackoverflow.com/a/12413491 """
+        var = float(standard_deviation)**2
+        pi = 3.1415926
+        denom = (2*pi*var)**.5
+        num = math.exp(-(float(x)-float(mean))**2/(2*var))
+        return num/denom
 
 class LightUpAnimation(Animation):
     """Simple animation that lights up the given key for a short period of time"""
