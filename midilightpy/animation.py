@@ -2,6 +2,8 @@
 from __future__ import print_function
 from __future__ import division
 
+import math
+
 from random import randint
 import time
 
@@ -55,6 +57,53 @@ class FireAnimation(Animation):
 
     def is_complete(self):
         return False
+
+class BeatAnimation(Animation):
+    """Lights up on a specific beat"""
+    def __init__(self, width, bpm, milliseconds=None):
+        Animation.__init__(self, milliseconds=None)
+        self._ms_per_beat = 1000 / (bpm / 60) 
+        self._current_pulse_time = self._milliseconds()
+        self._width = width
+
+        # Need to step between -1.5 and 1.5
+        step = 3.0 / width
+        x = -1.5
+        self._bell_curve = [0.0] * width
+
+        for i, _ in enumerate(self._bell_curve):
+            self._bell_curve[i] = normpdf(x, 0, 0.4)
+            print(self._bell_curve[i])
+            print(x)
+            x += step
+
+        print ("Beat interval {0} ".format(self._ms_per_beat))
+    
+    def get_frame(self):
+        now = self._milliseconds()
+        time_into_beat = now % self._ms_per_beat
+
+        # Brightness decreases as time progresses into the beat. Adjust to an interval between 0-255.
+        brightness = int((self._ms_per_beat - time_into_beat) / self._ms_per_beat * 256)
+        pixels = [(brightness, brightness, brightness)] * self._width
+
+        # Apply a bell curve to pixels - this avoids all of them lighting up and instead a soft ramp up and ramp down
+        for i, (r, g, b) in enumerate(pixels):
+            factor = self._bell_curve[i]
+            pixels[i] = (int(r * factor), int(g * factor), int(b * factor))
+        return pixels
+
+    def is_complete(self):
+        return False
+
+def normpdf(x, mean, standard_deviation):
+    """ Calculates the normal distribution using a probability density function
+        Found it here https://stackoverflow.com/a/12413491 """
+    var = float(standard_deviation)**2
+    pi = 3.1415926
+    denom = (2*pi*var)**.5
+    num = math.exp(-(float(x)-float(mean))**2/(2*var))
+    return num/denom
 
 class LightUpAnimation(Animation):
     """Simple animation that lights up the given key for a short period of time"""
