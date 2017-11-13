@@ -8,6 +8,7 @@ from __future__ import division
 import time
 from random import randint
 import animation
+import timer
 
 import mido
 
@@ -138,6 +139,10 @@ def main():
 
     #running_animation = animation.RunningAnimation(PIANO_KEYS)
     #animations.append(running_animation)
+    #running_animation = animation.BeatAnimation(88, 100)
+    #animations.append(running_animation)
+    practice_timer = timer.Timer()
+    animations.append(practice_timer)
 
     try:
 
@@ -191,6 +196,9 @@ def main():
                         configuration['status_brightness'] = 255
                     draw_status(status_color)
 
+                if 14 in chord:
+                    practice_timer.restart()
+
             #for i, pixel in enumerate(leds):
             #    r, g, b = (pixel)
             #    leds[i] = (int(r/1.2), int(g/1.2), int(b/1.2))
@@ -226,8 +234,8 @@ def main():
                         note = message.note - FIRST_MIDI_NOTE
                         chord.add(note)
                         #running_animation.key_pressed(message.velocity * 2)
-                        #animations.append(animation.PressureKeyPressAnimation(PIANO_KEYS,note, message.velocity * 2, 3000))
-                        animations.append(animation.ChristmasKeyPressAnimation(PIANO_KEYS, note, message.velocity * 2))
+                        animations.append(animation.PressureKeyPressAnimation(PIANO_KEYS,note, message.velocity * 2, 3000))
+                        #animations.append(animation.ChristmasKeyPressAnimation(PIANO_KEYS, note, message.velocity * 2))
                         #animations.append(animation.RunLeftAnimation(note))
                         #animations.append(animation.LightUpAnimation(PIANO_KEYS, note))
                     if message.type == 'note_off':
