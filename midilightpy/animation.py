@@ -12,7 +12,15 @@ class Animation(object):
        Keep calling get_frame until is_complete returns true.
     """
     def __init__(self, milliseconds=None):
-        """ Animation base class initializer """
+        """ Animation base class initializer
+
+        Parameters
+        ----------
+        milliseconds : function, optional
+            Optional function that returns the number of milliseconds elapsed. A default implementation
+            is provided that uses the system time. Provide an alternative function if time must be
+            externally controlled. This is useful in unit testing scenarios.
+        """
         object.__init__(self)
         if milliseconds is None:
             self._milliseconds = lambda: int(round(time.time() * 1000))
@@ -26,6 +34,32 @@ class Animation(object):
     def is_complete(self):
         """True if this animation is complete and can be removed"""
         return False
+
+class LeftRightAnimation(Animation):
+    """ Light runs side to side """
+    def __init__(self, milliseconds, length, frames_per_second):
+        """
+        Parameters
+        ----------
+        length : integer
+        The number of lights in the animation
+        """
+        Animation.__init__(self, milliseconds)
+        self._ = [length]
+        self._index = 0
+        self._last_frame_time = 0
+        self._milliseconds_per_frame = 1000 / frames_per_second
+        self._direction = 1
+
+    def get_frame(self):
+        now = self._milliseconds()
+        if now - self._last_frame_time > self._milliseconds_per_frame:
+            self._last_frame_time = now
+            self._index += self._direction
+            leds = [(0, 0, 0)] * 88
+
+        return self._lights
+
 
 class FireAnimation(Animation):
     """ Fire animation """
@@ -41,7 +75,7 @@ class FireAnimation(Animation):
         if self._milliseconds() > self._end:
             self._end = self._milliseconds() + 50
             self._lights = []
-            for i in range(0, 88):
+            for _ in range(0, 88):
                 flicker = randint(0, 150)
                 r1 = self._r - flicker
                 g1 = self._g - flicker
