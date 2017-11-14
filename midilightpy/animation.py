@@ -2,13 +2,25 @@
 from __future__ import print_function
 from __future__ import division
 
+import math
+
 from random import randint
 import time
 
 class Animation(object):
-    """The base class for any animation"""
+    """The base class for any animation. An animation is a state machine that produces frames.
+       Keep calling get_frame until is_complete returns true.
+    """
     def __init__(self, milliseconds=None):
-        """ Animation base class initializer """
+        """ Animation base class initializer
+
+        Parameters
+        ----------
+        milliseconds : function, optional
+            Optional function that returns the number of milliseconds elapsed. A default implementation
+            is provided that uses the system time. Provide an alternative function if time must be
+            externally controlled. This is useful in unit testing scenarios.
+        """
         object.__init__(self)
         if milliseconds is None:
             self._milliseconds = lambda: int(round(time.time() * 1000))
@@ -16,12 +28,38 @@ class Animation(object):
             self._milliseconds = milliseconds
 
     def get_frame(self):
-        """Return an array of integers representing the current state of the animation"""
+        """Return an array of tuples (r,g,b) i.e. the frame for the current state of the animation"""
         raise RuntimeError("GetFrame should only be called in derived classes")
 
     def is_complete(self):
         """True if this animation is complete and can be removed"""
         return False
+
+class LeftRightAnimation(Animation):
+    """ Light runs side to side """
+    def __init__(self, milliseconds, length, frames_per_second):
+        """
+        Parameters
+        ----------
+        length : integer
+        The number of lights in the animation
+        """
+        Animation.__init__(self, milliseconds)
+        self._ = [length]
+        self._index = 0
+        self._last_frame_time = 0
+        self._milliseconds_per_frame = 1000 / frames_per_second
+        self._direction = 1
+
+    def get_frame(self):
+        now = self._milliseconds()
+        if now - self._last_frame_time > self._milliseconds_per_frame:
+            self._last_frame_time = now
+            self._index += self._direction
+            leds = [(0, 0, 0)] * 88
+
+        return self._lights
+
 
 class FireAnimation(Animation):
     """ Fire animation """
@@ -37,7 +75,7 @@ class FireAnimation(Animation):
         if self._milliseconds() > self._end:
             self._end = self._milliseconds() + 50
             self._lights = []
-            for i in range(0, 88):
+            for _ in range(0, 88):
                 flicker = randint(0, 150)
                 r1 = self._r - flicker
                 g1 = self._g - flicker
@@ -54,11 +92,63 @@ class FireAnimation(Animation):
     def is_complete(self):
         return False
 
-class KeyPressAnimation(Animation):
-    """Simple animation that happens when you press a key"""
+class BeatAnimation(Animation):
+    """Lights up on a specific beat"""
+    def __init__(self, width, bpm, milliseconds=None):
+        Animation.__init__(self, milliseconds=None)
+        self._ms_per_beat = 1000 / (bpm / 60) 
+        self._current_pulse_time = self._milliseconds()
+        self._width = width
+        self._bell_curve = BeatAnimation.create_bell_curve(width)
+
+    @classmethod
+    def create_bell_curve(cls, width):
+        """ Create a bell curve with width elements and values between 0 and 1.
+            The standard deviation value of 0.4 means the curve will peak at 1.
+            Starting at around -1.5 to 1.5 gives a nice ramp up and down."""
+
+        # Need to step between -1.5 and 1.5
+        step = 2.0 / width
+        x = -1
+        curve = []
+
+        for _ in range(width):
+            curve.append(cls.normpdf(x, 0, 0.4))
+            x += step
+        return curve
+    
+    def get_frame(self):
+        now = self._milliseconds()
+        time_into_beat = now % self._ms_per_beat
+
+        # Brightness decreases as time progresses into the beat. Adjust to an interval between 0-255.
+        brightness = int((self._ms_per_beat - time_into_beat) / self._ms_per_beat * 256)
+        pixels = [(brightness, brightness, brightness)] * self._width
+
+        # Apply a bell curve to pixels - this avoids all of them lighting up and instead a soft ramp up and ramp down
+        for i, (r, g, b) in enumerate(pixels):
+            factor = self._bell_curve[i]
+            pixels[i] = (int(r * factor), int(g * factor), int(b * factor))
+        return pixels
+
+    def is_complete(self):
+        return False
+
+    @classmethod
+    def normpdf(cls, x, mean, standard_deviation):
+        """ Calculates the normal distribution using a probability density function
+            Found it here https://stackoverflow.com/a/12413491 """
+        var = float(standard_deviation)**2
+        pi = 3.1415926
+        denom = (2*pi*var)**.5
+        num = math.exp(-(float(x)-float(mean))**2/(2*var))
+        return num/denom
+
+class LightUpAnimation(Animation):
+    """Simple animation that lights up the given key for a short period of time"""
 
     def __init__(self, keys, key_pressed, duration=1000, milliseconds=None):
-        """Initializes a new KeyPressAnimation instance"""
+        """Initializes a new LightUpAnimation instance"""
         Animation.__init__(self)
         self._end = self._milliseconds() + duration
         self._leds = [(0, 0, 0)] * keys
@@ -73,21 +163,21 @@ class KeyPressAnimation(Animation):
         """True if this animation is complete and can be removed"""
         return self._milliseconds() > self._end
 
-class PressureKeyPressAnimation(KeyPressAnimation):
+class PressureKeyPressAnimation(LightUpAnimation):
     """Simple animation that happens when you press a key. It is pressure sensitive."""
 
     def __init__(self, keys, key_pressed, velocity, duration=1000, milliseconds=None):
         """Initializes a new PressureKeyPressAnimation instance"""
-        KeyPressAnimation.__init__(self, keys, key_pressed, duration, milliseconds)
+        LightUpAnimation.__init__(self, keys, key_pressed, duration, milliseconds)
         self._velocity = velocity
         self._duration = duration
 
     def get_key_color(self):
-        """Returns the color of the key pressed during animation. Override to change. """
+        """Returns the color of the key pressed during animation. Override to change."""
         return (self._velocity, self._velocity, self._velocity)
 
     def get_frame(self):
-        """Return an array of integers representing the current state of the animation"""
+        """Return an array of integers representing the current state of the animation."""
 
         time_left = self._end - self._milliseconds()
         if time_left < 0:

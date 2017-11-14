@@ -6,10 +6,11 @@ from __future__ import print_function
 from __future__ import division
 
 import time
+from random import randint
 import animation
+import timer
 
 import mido
-from random import randint
 
 #import sys
 #print(sys.path)
@@ -34,7 +35,8 @@ ALL_LIGHTS = PIANO_KEYS + STATUS_LIGHTS
 # The first note (far left) on your keyboard
 FIRST_MIDI_NOTE = 21
 
-gamma = [ \
+# pylint: disable=C0326
+GAMMA = [ \
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,\
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,\
     1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,\
@@ -55,12 +57,12 @@ gamma = [ \
 # TODO: Need to refactor this main module into it's own class
 configuration = {}
 # This overload uses SPI
-strip = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
+STRIP = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
 
-status_color = None
-
-def detect_usb_midi():
-
+def detect_midi_device():
+    """Returns the a MIDI device name. Looks for devices starting with 'USB', 'MIDI 1' or 'VMPK'.
+    None otherwise.
+    """
     midi_devices = []
     try:
         # Override default (portmidi) to use rtmidi. Note that portmidi
@@ -72,20 +74,26 @@ def detect_usb_midi():
     except ImportError:
         print("Could not load rtmidi. Try 'pip install python-rtmidi'")
 
-    """Returns the first device with USB in the name. None otherwise."""
     first_usb_device = next((x for x in midi_devices if 'USB' in x), None)
 
     if first_usb_device is None:
         print("Trying name 'MIDI 1'")
         first_usb_device = next((x for x in midi_devices if 'MIDI 1' in x), None)
 
+    if first_usb_device is None:
+        print("Trying name VMPK")
+        first_usb_device = next((x for x in midi_devices if 'VMPK' in x), None)
+
     return first_usb_device
 
-def color_blend(a, b):
+def color_blend(color_a, color_b):
     """Performs a Screen blend on RGB color tuples, a and b"""
-    return (255 - (((255 - a[0]) * (255 - b[0])) >> 8), 255 - (((255 - a[1]) * (255 - b[1])) >> 8), 255 - (((255 - a[2]) * (255 - b[2])) >> 8))
+    return (255 - (((255 - color_a[0]) * (255 - color_b[0])) >> 8), \
+            255 - (((255 - color_a[1]) * (255 - color_b[1])) >> 8), \
+            255 - (((255 - color_a[2]) * (255 - color_b[2])) >> 8))
 
 def draw_status(color):
+    """Draws the status lights underneath the light bar"""
     if not color is None:
         # Adjust brightness
         r, g, b = ((color >> 16) & 255, (color >> 8) & 255, color & 255)
@@ -94,16 +102,16 @@ def draw_status(color):
         g = int(g * (configuration['status_brightness'] / 255))
         color = b + (g << 8) + (r << 16)
         for pixel in range(PIANO_KEYS, ALL_LIGHTS):
-            strip.setPixelColor(pixel, color)
+            STRIP.setPixelColor(pixel, color)
 
 def main():
     """ The main loop """
-    global status_color
+    status_color = None
 
     animations = []
     leds = [(0, 0, 0)] * PIANO_KEYS
 
-    usb_device_name = detect_usb_midi()
+    usb_device_name = detect_midi_device()
     if usb_device_name:
         print("Opening {0} port".format(usb_device_name))
         midi_input = mido.open_input(usb_device_name)
@@ -123,34 +131,37 @@ def main():
     # Start in demo on startup
     last_key_time = time.time() - configuration['demo_delay']
 
-    strip.begin()
-    strip.show()
+    STRIP.begin()
+    STRIP.show()
 
     # Used to detect the "secret chord" for controlling various aspects
     chord = set()
 
-    running_animation = animation.RunningAnimation(PIANO_KEYS)
-    animations.append(running_animation)
+    #running_animation = animation.RunningAnimation(PIANO_KEYS)
+    #animations.append(running_animation)
+    #running_animation = animation.BeatAnimation(88, 100)
+    #animations.append(running_animation)
+    practice_timer = timer.Timer()
+    animations.append(practice_timer)
 
     try:
 
         while True:
-    
             idle_time = time.time() - last_key_time
             if idle_time > configuration['demo_done']:
                 if configuration['mode'] != 'sleep':
                     configuration['mode'] = 'sleep'
                     status_color = 0x000000
-                    strip.clear()
-                    strip.show()
-                    draw_status(status_color)
+                    STRIP.clear()
+                    STRIP.show()
             elif idle_time > configuration['demo_delay']:
-                if configuration['mode'] != 'demo':  
+                if configuration['mode'] != 'demo':
                     configuration['mode'] = 'demo'
             elif configuration['mode'] != 'midi':
-                configuration['mode'] = 'midi'        
+                configuration['mode'] = 'midi'
 
-            # Apply an optional filter (default is to black out LEDs). For now, directly clear the buffer
+            # Apply an optional filter (default is to black out LEDs).
+            # For now, directly clear the buffer.
             leds = [(0, 0, 0)] * PIANO_KEYS
 
             if set([0, 1]).issubset(chord):
@@ -170,7 +181,7 @@ def main():
                 if 7 in chord:
                     status_color = 0x000000
 
-                draw_status(status_color)                
+                draw_status(status_color)
 
                 # 15 is the second C note from the left. Toggle brightness down.
                 if 15 in chord:
@@ -185,6 +196,9 @@ def main():
                         configuration['status_brightness'] = 255
                     draw_status(status_color)
 
+                if 14 in chord:
+                    practice_timer.restart()
+
             #for i, pixel in enumerate(leds):
             #    r, g, b = (pixel)
             #    leds[i] = (int(r/1.2), int(g/1.2), int(b/1.2))
@@ -195,16 +209,18 @@ def main():
                     r, g, b = (frame_pixel)
                     if r > 0 or g > 0 or b > 0:
                         leds[i] = color_blend(leds[i], frame_pixel)
+
             animations = [x for x in animations if not x.is_complete()]
+
             for i, pixel in enumerate(leds):
                 r, g, b = (pixel)
                 if configuration['gamma_correction']:
-                    r = gamma[r]
-                    g = gamma[g]
-                    b = gamma[b]
-                strip.setPixelColor(i, r, g, b)
+                    r = GAMMA[r]
+                    g = GAMMA[g]
+                    b = GAMMA[b]
+                STRIP.setPixelColor(i, r, g, b)
 
-            strip.show()
+            STRIP.show()
 
             # Experiment to see how long we need to sleep - it seems that this may cause problems
             # if too short
@@ -217,9 +233,11 @@ def main():
                     if message.type == 'note_on':
                         note = message.note - FIRST_MIDI_NOTE
                         chord.add(note)
-                        running_animation.key_pressed(message.velocity * 2)
-                        #animations.append(animation.PressureKeyPressAnimation(PIANO_KEYS,note, message.velocity * 2, 3000))
-                        #animations.append(animation.ChristmasKeyPressAnimation(note, message.velocity * 2))
+                        #running_animation.key_pressed(message.velocity * 2)
+                        animations.append(animation.PressureKeyPressAnimation(PIANO_KEYS,note, message.velocity * 2, 3000))
+                        #animations.append(animation.ChristmasKeyPressAnimation(PIANO_KEYS, note, message.velocity * 2))
+                        #animations.append(animation.RunLeftAnimation(note))
+                        #animations.append(animation.LightUpAnimation(PIANO_KEYS, note))
                     if message.type == 'note_off':
                         note = message.note - FIRST_MIDI_NOTE
                         if note in chord:
@@ -238,18 +256,18 @@ def main():
 
     except KeyboardInterrupt:
         print("Exiting...")
-        strip.clear()
-        strip.show()
-        strip.close()
+        STRIP.clear()
+        STRIP.show()
+        STRIP.close()
         if midi_input:
             midi_input.close()
 
 def strand_test():
     """ Basically the same as the Adafruit stand test """
 
-    strip = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
-    strip.begin()
-    strip.show()
+    test_strip = Adafruit_DotStar(ALL_LIGHTS, 12000000, order='bgr')
+    test_strip.begin()
+    test_strip.show()
 
     head = 0                                # Index of first 'on' pixel
     tail = -10                              # Index of last 'off' pixel
@@ -257,9 +275,9 @@ def strand_test():
 
     counter = ALL_LIGHTS * 3 + 10
     while counter > 0:                             # Loop forever
-        strip.setPixelColor(head, color)    # Turn on 'head' pixel
-        strip.setPixelColor(tail, 0)        # Turn off 'tail'
-        strip.show()                        # Refresh strip
+        test_strip.setPixelColor(head, color)    # Turn on 'head' pixel
+        test_strip.setPixelColor(tail, 0)        # Turn off 'tail'
+        test_strip.show()                        # Refresh strip
         time.sleep(1.0 / 100)                # Pause 20 milliseconds (~50 fps)
         head += 1                           # Advance head position
         if head >= ALL_LIGHTS:              # Off end of strip?
@@ -275,4 +293,3 @@ def strand_test():
 
 #strand_test()
 main()
-
