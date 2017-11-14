@@ -1,10 +1,11 @@
+from __future__ import division
 from animation import Animation
 
 class Timer(Animation):
     """A timer implementation that tracks minutes up to an hour"""
     def __init__(self):
         Animation.__init__(self)
-        self._start = self._milliseconds() - (59 * 60 * 1000)
+        self._start = self._milliseconds()
         self._hide_until = 0
 
     def get_frame(self):
@@ -16,8 +17,8 @@ class Timer(Animation):
         if now > self._hide_until:
             current_milliseconds = (now - self._start) % (60 * 60 * 1000)
             current_seconds = current_milliseconds / 1000
-            current_minutes = current_seconds / 60
-            current_ten_minute_interval = current_minutes / 10
+            current_minutes = int(current_seconds / 60)
+            current_ten_minute_interval = int(current_minutes / 10)
 
             # Indicate current minute within the 10 minute bracket.
             # If it falls on the 10 minute interval, the next one will overwrite it (10 minute markers take priority)
@@ -30,7 +31,7 @@ class Timer(Animation):
                 pixels[i * 10 + 10] = (0, 0, 255)
 
             # Indicate current second position.
-            pixels[current_seconds % 60] = (0xFF, 0x14, 0x93)
+            pixels[int(current_seconds % 60)] = (0xFF, 0x14, 0x93)
 
         return pixels
 

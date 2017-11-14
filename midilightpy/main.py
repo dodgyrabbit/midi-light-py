@@ -156,6 +156,8 @@ def main():
             elif idle_time > configuration['demo_delay']:
                 if configuration['mode'] != 'demo':
                     configuration['mode'] = 'demo'
+                    # Hide "forever" while in demo mode. TODO: Improve with special case.
+                    practice_timer.hide(1000 * 60 * 60 * 24 * 365)
             elif configuration['mode'] != 'midi':
                 configuration['mode'] = 'midi'
 
@@ -244,7 +246,7 @@ def main():
                             chord.remove(note)
 
             if configuration['mode'] == 'demo':
-                if randint(0, 20) == 0:
+                if randint(0, 15) == 0:
 
                     # Here we would get a key press
                     key_pressed = randint(0, PIANO_KEYS-1)
