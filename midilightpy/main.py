@@ -139,10 +139,9 @@ def main():
 
     #running_animation = animation.RunningAnimation(PIANO_KEYS)
     #animations.append(running_animation)
-    #running_animation = animation.BeatAnimation(88, 100)
-    #animations.append(running_animation)
     practice_timer = timer.Timer()
     animations.append(practice_timer)
+    #animations.append(animation.BeatAnimation(44, 80))
 
     try:
 
