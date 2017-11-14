@@ -16,7 +16,7 @@ from random import randint
 
 # Dynamically decide if we use the emulator or an actual DotStar.
 try:
-    from lib.dotstar import Adafruit_DotStar
+    from dotstar import Adafruit_DotStar
     # On RPI use this line instead
     # from dotstar import Adafruit_DotStar
 except ImportError:
