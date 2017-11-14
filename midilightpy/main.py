@@ -124,7 +124,7 @@ def main():
     configuration['mode'] = 'demo'
     configuration['gamma_correction'] = False
     configuration['animation'] = 1
-    configuration['demo_delay'] = 60
+    configuration['demo_delay'] = 60 * 5
     configuration['demo_done'] = 60 * 60
     configuration['status_brightness'] = 255
 
@@ -230,6 +230,7 @@ def main():
                 for message in midi_input.iter_pending():
                     print(message)
                     last_key_time = time.time()
+                    practice_timer.hide(10*1000)
                     if message.type == 'note_on':
                         note = message.note - FIRST_MIDI_NOTE
                         chord.add(note)
