@@ -1,3 +1,0 @@
-[submodule "lib/Adafruit_DotStar_Pi"]
-	path = lib/Adafruit_DotStar_Pi
-	url = https://github.com/adafruit/Adafruit_DotStar_Pi
