@@ -8,17 +8,50 @@ strip and blend in with the environment. The LEDs also project onto the wall for
 
 # Installation
 
-Clone the repo locally on your Raspberry PI. This repository uses Git submodules (for the Adafruit library).
+Although not required, it is recommended to use a Python virtual environment.
+
+``
+sudo apt install python3-venv
+``
 
 ```
 git clone https://github.com/dodgyrabbit/midi-light-py.git
+cd midi-light-py
 ```
 
-If the /lib folder is empty, use the commands below to update. Newer versions of Git automatically pulls them during initial clone, so this step won't be needed.
+Create the virtual environment
+
 ```
-git submodule init
-git submodule update
+python3 -m venv .venv
 ```
+
+Activate the virtual environment
+
+```
+. venv/bin/activate
+```
+
+I had to do the following before I could succesfully install the Datafruit CircuitPython DotStar library
+
+Make sure the latest setuptools is installed. This will make sure the virtual environment has the latest.
+```
+pip3 install setuptools --upgrade
+```
+
+Wheel is needed too
+```
+pip3 install wheel
+```
+
+Install the Adafruit CircuitPython DotStar library.
+
+```
+pip3 install adafruit-circuitpython-dotstar
+```
+
+
+
+
 
 The only tricky part is to install [python-rtmidi](https://spotlightkid.github.io/python-rtmidi/index.html)
 
